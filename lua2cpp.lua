@@ -5,7 +5,7 @@ local decl =
 -- @email: 308831759@qq.com
 -- @homepage: www.lichuan.me
 -- @date: 2012-11-29 
--- @desc: this is the generator for lua interface in c++ application.
+-- @desc: this is the generator of lua interface in c++ application.
 ]] 
 
 -- local reg_path = "/sdcard/sigmascript/lua_register.txt" 
