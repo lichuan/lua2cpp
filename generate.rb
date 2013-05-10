@@ -1,4 +1,9 @@
-#author = lichuan
+# @author: lichuan
+# @qq: 308831759
+# @email: 308831759@qq.com
+# @homepage: www.lichuan.me
+# @date: 2013-05-11
+# @desc: this is the generator of lua interface in c++ application.
 
 def parse_namespace_class(tbl_namespace, tbl_class, full_name)
   full_name.prepend(".")
