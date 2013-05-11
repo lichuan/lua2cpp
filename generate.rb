@@ -1,9 +1,11 @@
-# @author: lichuan
-# @qq: 308831759
-# @email: 308831759@qq.com
-# @homepage: www.lichuan.me
-# @date: 2013-05-11
-# @desc: this is the generator of lua interface in c++ application.
+$decl = <<INTRO
+@author: lichuan
+@qq: 308831759
+@email: 308831759@qq.com
+@homepage: www.lichuan.me
+@date: 2013-05-11
+@desc: this is the generator of lua interface in c++ application.
+INTRO
 
 def parse_namespace_class(tbl_namespace, tbl_class, full_name)
   full_name.prepend(".")
@@ -47,7 +49,8 @@ def parse_function_1(tbl_func, func_str)
 end
 
 def parse_type(tbl_type, type_str)
-  match_list = /([^\s\*]+)(\*)?(\|gc\|)?/.match(type_str)
+  return if type_str.empty?
+  match_list = /([^\s\*\|]+)(\*)?(\|gc\|)?/.match(type_str)
   if match_list.nil?
     error_msg("type invalid in #{type_str}")
   else
@@ -62,7 +65,7 @@ def parse_type(tbl_type, type_str)
         error_msg("basic type does not support |gc| in #{type_str}")
       end
     elsif not $reg_info.has_key?(match_list[1])
-      error_msg("type #{match_list[1]} is not exist")
+      error_msg("type #{match_list[1]} is not exist in #{type_str}")
     else
       if match_list[2] == "*"
         tbl_type["is_pointer"] = true
@@ -114,6 +117,7 @@ def parse_function_3(tbl_func, func_str)
     tbl_func["direct_set"] = true
     tbl_func["name"] = match_list[2]
     parse_argument(tbl_func["arg"], match_list[3])
+    parse_type(tbl_func["ret_type"], match_list[1])
   end
 end
 
@@ -133,7 +137,7 @@ def parse_lua_reg_file
   match_list = /([^\{]*?)[^\n]*\n\{/.match(lua_reg_content)
   $head = match_list[1]
   body = lua_reg_content[$head.size..-1]
-  body.scan(/([^\n]*)\n\{\n(.*?)\n\}/m) do |part1, part2|
+  body.scan(/([^\n]+)\n\{\n(.*?)\n\}/m) do |part1, part2|
     full_name = part1.match(/[^\s]*/)[0]
     tbl = {}
     tbl["namespace"] = {}
@@ -144,7 +148,7 @@ def parse_lua_reg_file
     error_msg("#{part1} have already registered") if $reg_info.has_key?(full_name)
     $reg_info[full_name] = tbl
   end
-  body.scan(/([^\n]*)\n\{\n(.*?)\n\}/m) do |part1, part2|
+  body.scan(/(^[^\s][^\n]*)\n\{\n(.*?)\n\}/m) do |part1, part2|
     full_name = part1.match(/[^\s]*/)[0]
     tbl = $reg_info[full_name]
     parse_namespace_class(tbl["namespace"], tbl["class"], full_name)
@@ -174,11 +178,45 @@ def parse_lua_reg_file
       else
         parse_function(tbl["function"][func_idx], function_line)
       end
+      func_idx += 1
     end
   end
 end
 
-parse_lua_reg_file
+def generate_header()
+  puts "/*"
+  $decl.each_line do |line|
+    puts " #{line}"
+  end
+  puts "*/"
+  puts
+  puts $head
+end
 
+def generate_cpp_file()
+  generate_header
+  $reg_info.each_value do |v|
+    v["function"].each_value do |func_v|
+      func_decl = "int lua_function"
+      v["namespace"].each_value do |ns_v|
+        func_decl += "____" + ns_v
+      end
+      v["class"].each_value do |cls_v|
+        func_decl += "___" + cls_v
+      end
+      func_decl += "__" + func_v["export_name"] + "(lua_State *L)"
+      func_decl += "\n{"
+      func_decl += "    test;"
+      func_decl += "\n}"
+      2.times{puts}
+
+      puts func_decl
+    end
+
+  end
+end
+
+parse_lua_reg_file
+generate_cpp_file
 
 
