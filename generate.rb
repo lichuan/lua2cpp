@@ -1,4 +1,4 @@
-$decl = <<INTRO
+$decl = <<-INTRO
 @author: lichuan
 @qq: 308831759
 @email: 308831759@qq.com
@@ -20,7 +20,7 @@ def parse_namespace_class(tbl_namespace, tbl_class, full_name)
 end
 
 def is_basic_type(type_str)
-  ["string", "int", "number"].each { |basic_type| return true if type_str == basic_type }
+  ["string", "int", "number", "uint"].each { |basic_type| return true if type_str == basic_type }
   false
 end
 
@@ -50,7 +50,7 @@ end
 
 def parse_type(tbl_type, type_str)
   return if type_str.empty?
-  match_list = /([^\s\*\|]+)(\*)?(\|gc\|)?/.match(type_str)
+  match_list = /([^\s\*\|\&]+)(\*|\&)?(\|gc\|)?/.match(type_str)
   if match_list.nil?
     error_msg("type invalid in #{type_str}")
   else
@@ -58,17 +58,16 @@ def parse_type(tbl_type, type_str)
     tbl_type["name"] = type
     if is_basic_type type
       tbl_type["is_basic"] = true
-      if match_list[2] == "*"
-        error_msg("basic type does not support pointer in #{type_str}")
-      end
-      if match_list[3] == "|gc|"
-        error_msg("basic type does not support |gc| in #{type_str}")
+      ["*", "|gc|", "&"].each do |v|
+        error_msg("basic type does not support #{v} in #{type_str}") if match_list[2] == v or match_list[3] == v
       end
     elsif not $reg_info.has_key?(match_list[1])
       error_msg("type #{match_list[1]} is not exist in #{type_str}")
     else
       if match_list[2] == "*"
-        tbl_type["is_pointer"] = true
+        tbl_type["is_ptr"] = true
+      elsif match_list[2] == "&"
+        tbl_type["is_ref"] = true
       end
       if match_list[3] == "|gc|"
         tbl_type["gc"] = true
@@ -171,10 +170,11 @@ def parse_lua_reg_file
       match_list = /^\((.*)\)/.match(function_line)
       if not match_list.nil?
         tbl["function"][func_idx]["is_new_function"] = true
-        new_idx += 1
-        tbl["function"][func_idx]["export_name"] = "new#{new_idx}"
+        tbl["function"][func_idx]["export_name"] = "new" if new_idx == 0
+        tbl["function"][func_idx]["export_name"] = "new#{new_idx}" if new_idx > 0
         args = match_list[1]
         parse_argument(tbl["function"][func_idx]["arg"], args)
+        new_idx += 1
       else
         parse_function(tbl["function"][func_idx], function_line)
       end
@@ -184,36 +184,62 @@ def parse_lua_reg_file
 end
 
 def generate_header()
-  puts "/*"
+  header = "/*\n"
   $decl.each_line do |line|
-    puts " #{line}"
+    header += " #{line}"
   end
-  puts "*/"
-  puts
-  puts $head
+  header += "*/\n\n"
+end
+
+def generate_register_table(full_name)
+  reg_dict = $reg_info[full_name]
+  reg_str = ""
+  name_list = full_name.split(".")
+  reg_str += %Q{luaL_newmetatable(L, "#{full_name}");\n}
+  name_list.each do |elem|
+    reg_str += %Q!lua_getglobal(L, "#{elem}");
+if(lua_istable(L, -1) == 0)
+{
+    lua_newtable(L);
+}
+!
+  end
+  format_str = ""
+  reg_str.each_line {|line| format_str << "    #{line}"}
+  format_str
 end
 
 def generate_cpp_file()
-  generate_header
-  $reg_info.each_value do |v|
+  gen_str = generate_header
+  reg_table_str = 'static int find_member_self_and_super(lua_State *L)
+{
+    assert(lua_istable(L, -1));
+    lua_getfield(L, -1, "full_name");
+}
+
+static void register_table(lua_State *L)
+{
+'
+  $reg_info.each do |full_name, v|
+    reg_table_str += generate_register_table(full_name)
     v["function"].each_value do |func_v|
-      func_decl = "int lua_function"
+      gen_str += "static int lua_function"
       v["namespace"].each_value do |ns_v|
-        func_decl += "____" + ns_v
+        gen_str += "____" + ns_v
       end
       v["class"].each_value do |cls_v|
-        func_decl += "___" + cls_v
+        gen_str += "___" + cls_v
       end
-      func_decl += "__" + func_v["export_name"] + "(lua_State *L)"
-      func_decl += "\n{"
-      func_decl += "    test;"
-      func_decl += "\n}"
-      2.times{puts}
-
-      puts func_decl
+      gen_str += "__" + func_v["export_name"] + "(lua_State *L)"
+      gen_str += "\n{"
+      if func_v["is_new_function"]
+      end
+      gen_str += "    test;"
+      gen_str += "\n}\n\n"
     end
-
   end
+  reg_table_str += "}"
+  File.open("./lua_cpp.cpp", "w").write(gen_str + reg_table_str)
 end
 
 parse_lua_reg_file
