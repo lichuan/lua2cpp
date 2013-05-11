@@ -11,6 +11,7 @@ _
 
 _arg.Cpp_Arg
 {
+    ()
     (int, number,string)
     int hp
     getd : d=_base.Base1
@@ -21,9 +22,10 @@ _arg.Cpp_Arg
 
 _base.Base1
 {
+    ()
     r3r3r : pt_hello_v()
     IJ3RJ2 : pt_arg_1(_arg.Cpp_Arg*|gc|)
-    get_info(_arg.Cpp_Arg*|gc|, _engine._memory.Base3*|gc|)
+    get_info(_arg.Cpp_Arg&|gc|, _engine._memory.Base3*|gc|)
 }
 
 _engine._memory.Base2
