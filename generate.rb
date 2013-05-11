@@ -195,12 +195,18 @@ def generate_register_table(full_name)
   reg_dict = $reg_info[full_name]
   reg_str = ""
   name_list = full_name.split(".")
-  reg_str += %Q{luaL_newmetatable(L, "#{full_name}");\n}
-  name_list.each do |elem|
-    reg_str += %Q!lua_getglobal(L, "#{elem}");
+  cur_full_name = ""
+  puts full_name
+  name_list.each_with_index do |elem, idx|
+    cur_full_name << "."  if idx > 0
+    cur_full_name << elem
+    puts cur_full_name
+    reg_str += %Q!lua_getglobal(L, "#{elem}");\n! if idx == 0
+    reg_str += %Q!
 if(lua_istable(L, -1) == 0)
 {
-    lua_newtable(L);
+    luaL_newmetatable(L, "#{cur_full_name}");
+    lua_setglobal(L,
 }
 !
   end
