@@ -12,31 +12,33 @@ _
 _arg.Cpp_Arg
 {
     (int, number,string)
-    get_hp : int .hp
-    set_hp : static abcd* .hp=int
+    int hp
+    getd : d=_base.Base1
+    set_hp : static _engine._memory.Base3*|gc| hp=int
     get_v : int get_value()
     set_v : set_value(int)
 }
 
 _base.Base1
 {
-    pt_hello_v()
-    pt_arg_1(_arg.Cpp_Arg*)
+    r3r3r : pt_hello_v()
+    IJ3RJ2 : pt_arg_1(_arg.Cpp_Arg*|gc|)
+    get_info(_arg.Cpp_Arg*|gc|, _engine._memory.Base3*|gc|)
 }
 
 _engine._memory.Base2
 {
     pt_world_v()
     pt_world()
-    pt_arg_2(_arg.Cpp_Arg*)
+    _engine._memory.Base3 pt_arg_2(_arg.Cpp_Arg*)
 }
 
-_engine._memory
+_engine._memory.Base3
 {
-    string get_name(int)
+    string   get_name(int)
 }
 
-Derived inherit from [_base.Base1,engine._memory.Base2]
+Derived.iii extends _base.Base1,engine._memory.Base2
 {
     static pt_hello_v()
     pt_world()
