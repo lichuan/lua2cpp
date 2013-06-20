@@ -1,1 +1,1 @@
-this is a generator of lua interface in c++.
+this is a generator of binding code between lua and c++.
