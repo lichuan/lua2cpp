@@ -54,6 +54,11 @@ def parse_type(tbl_type, type_str, is_ret)
   if match_list.nil?
     error_msg("type invalid in #{type_str}")
   else
+    if match_list[3] == "|gc|"
+      if not is_ret
+        error_msg("argument can not be |gc| in #{type_str}")
+      end
+    end
     type = match_list[1]
     tbl_type["name"] = type
     if is_basic_type type
@@ -70,9 +75,6 @@ def parse_type(tbl_type, type_str, is_ret)
         tbl_type["is_ref"] = true
       end
       if match_list[3] == "|gc|"
-        if not is_ret
-          error_msg("argument can not be |gc| in #{type_str}")
-        end
         tbl_type["gc"] = true
       end
     end
