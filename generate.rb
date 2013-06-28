@@ -107,7 +107,7 @@ def parse_function_3(tbl_func, func_str)
       error_msg("function is invalid in #{func_str}")
     else
       parse_type(tbl_func["ret_type"], match_list[1], true)
-      tbl_func["direct_get"] = true
+      tbl_func["is_get"] = true
       tbl_func["name"] = match_list[2]
       if not tbl_func.has_key?("export_name")
         tbl_func["export_name"] = match_list[2]
@@ -116,7 +116,7 @@ def parse_function_3(tbl_func, func_str)
   elsif not tbl_func.has_key?("export_name")
     error_msg("no export name assign in #{func_str}")
   else
-    tbl_func["direct_set"] = true
+    tbl_func["is_set"] = true
     tbl_func["name"] = match_list[2]
     parse_argument(tbl_func["arg"], match_list[3])
     parse_type(tbl_func["ret_type"], match_list[1], true)
@@ -173,7 +173,7 @@ def parse_lua_reg_file
       puts function_line
       match_list = /^\((.*)\)/.match(function_line)
       if not match_list.nil?
-        tbl["function"][func_idx]["is_new_function"] = true
+        tbl["function"][func_idx]["is_new"] = true
         tbl["function"][func_idx]["export_name"] = "new" if new_idx == 0
         tbl["function"][func_idx]["export_name"] = "new#{new_idx}" if new_idx > 0
         args = match_list[1]
