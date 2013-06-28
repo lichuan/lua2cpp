@@ -20,7 +20,7 @@ def parse_namespace_class(tbl_namespace, tbl_class, full_name)
 end
 
 def is_basic_type(type_str)
-  ["string", "int", "number", "uint"].each { |basic_type| return true if type_str == basic_type }
+  ["string", "int32", "number", "uint32"].each { |basic_type| return true if type_str == basic_type }
   false
 end
 
@@ -29,7 +29,7 @@ def parse_argument(tbl_arg, args)
     arg = arr[0]
     idx = tbl_arg.size
     tbl_arg[idx] = {}
-    parse_type(tbl_arg[idx], arg)
+    parse_type(tbl_arg[idx], arg, false)
   end
 end
 
@@ -48,7 +48,7 @@ def parse_function_1(tbl_func, func_str)
   end
 end
 
-def parse_type(tbl_type, type_str)
+def parse_type(tbl_type, type_str, is_ret)
   return if type_str.empty?
   match_list = /([^\s\*\|\&]+)(\*|\&)?(\|gc\|)?/.match(type_str)
   if match_list.nil?
@@ -70,6 +70,9 @@ def parse_type(tbl_type, type_str)
         tbl_type["is_ref"] = true
       end
       if match_list[3] == "|gc|"
+        if not is_ret
+          error_msg("argument can not be |gc| in #{type_str}")
+        end
         tbl_type["gc"] = true
       end
     end
@@ -89,9 +92,9 @@ def parse_function_2(tbl_func, func_str)
         tbl_func["export_name"] = func_name
       end
       if not match_list[1].empty?
-        parse_type(tbl_func["ret_type"], match_list[1])
+        parse_type(tbl_func["ret_type"], match_list[1], true)
       end
-    parse_argument(tbl_func["arg"], match_list[3])
+      parse_argument(tbl_func["arg"], match_list[3])
     end
   end
 end
@@ -103,7 +106,7 @@ def parse_function_3(tbl_func, func_str)
     if match_list.nil?
       error_msg("function is invalid in #{func_str}")
     else
-      parse_type(tbl_func["ret_type"], match_list[1])
+      parse_type(tbl_func["ret_type"], match_list[1], true)
       tbl_func["direct_get"] = true
       tbl_func["name"] = match_list[2]
       if not tbl_func.has_key?("export_name")
@@ -116,7 +119,7 @@ def parse_function_3(tbl_func, func_str)
     tbl_func["direct_set"] = true
     tbl_func["name"] = match_list[2]
     parse_argument(tbl_func["arg"], match_list[3])
-    parse_type(tbl_func["ret_type"], match_list[1])
+    parse_type(tbl_func["ret_type"], match_list[1], true)
   end
 end
 
@@ -167,6 +170,7 @@ def parse_lua_reg_file
       function_line = arr[0]
       tbl["function"][func_idx] = {}
       tbl["function"][func_idx]["arg"] = {}
+      puts function_line
       match_list = /^\((.*)\)/.match(function_line)
       if not match_list.nil?
         tbl["function"][func_idx]["is_new_function"] = true
@@ -196,11 +200,11 @@ def generate_register_table(full_name)
   reg_str = ""
   name_list = full_name.split(".")
   cur_full_name = ""
-  puts full_name
+  #puts full_name
   name_list.each_with_index do |elem, idx|
     cur_full_name << "."  if idx > 0
     cur_full_name << elem
-    puts cur_full_name
+    #puts cur_full_name
     reg_str += %Q!lua_getglobal(L, "#{elem}");\n! if idx == 0
     reg_str += %Q!
 if(lua_istable(L, -1) == 0)
@@ -250,5 +254,4 @@ end
 
 parse_lua_reg_file
 generate_cpp_file
-
 
