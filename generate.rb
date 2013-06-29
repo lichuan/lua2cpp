@@ -56,7 +56,7 @@ def parse_type(tbl_type, type_str, is_ret)
   else
     if match_list[3] == "|gc|"
       if not is_ret
-        error_msg("argument can not be |gc| in #{type_str}")
+        error_msg("function parameter should not be |gc| in #{type_str}")
       end
     end
     type = match_list[1]
