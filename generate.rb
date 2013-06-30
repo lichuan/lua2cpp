@@ -246,7 +246,7 @@ static void register_table(lua_State *L)
       gen_str += "\n{"
       if func_v["is_new_function"]
       end
-      gen_str += "    test;"
+      gen_str += "\n    test;"
       gen_str += "\n}\n\n"
     end
   end

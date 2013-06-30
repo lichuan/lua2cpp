@@ -12,20 +12,20 @@ _
 _arg.Cpp_Arg
 {
     ()
-    (int, number,string)
-    int hp
+    (int32, number,string)
+    int32 hp
     getd : d=_base.Base1
-    set_hp : static _engine._memory.Base3*|gc| hp=int
-    get_v : int get_value()
-    set_v : set_value(int)
+    set_hp : static _engine._memory.Base3* hp=int32
+    get_v : int32 get_value()
+    set_v : set_value(int32)
 }
 
 _base.Base1
 {
     ()
     r3r3r : pt_hello_v()
-    IJ3RJ2 : pt_arg_1(_arg.Cpp_Arg*|gc|)
-    get_info(_arg.Cpp_Arg&|gc|, _engine._memory.Base3*|gc|)
+    IJ3RJ2 : pt_arg_1(_arg.Cpp_Arg*)
+    get_info(_arg.Cpp_Arg&, _engine._memory.Base3*)
 }
 
 _engine._memory.Base2
@@ -37,7 +37,7 @@ _engine._memory.Base2
 
 _engine._memory.Base3
 {
-    string   get_name(int)
+    string   get_name(int32)
 }
 
 Derived.iii extends _base.Base1,engine._memory.Base2
