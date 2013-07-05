@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 $decl = <<-INTRO
 @author: lichuan
 @qq: 308831759
