@@ -137,7 +137,7 @@ def parse_function(tbl_func, func_str)
   end
 end
 
-def parse_lua_reg_file
+def parse_file
   $reg_info = {}
   lua_reg_content = File.open("./lua_register.txt").readlines().join
   match_list = /([^\{]*?)[^\n]*\n\{/.match(lua_reg_content)
@@ -174,7 +174,6 @@ def parse_lua_reg_file
       function_line = arr[0]
       tbl["function"][func_idx] = {}
       tbl["function"][func_idx]["arg"] = {}
-      puts function_line
       match_list = /^\((.*)\)/.match(function_line)
       if not match_list.nil?
         tbl["function"][func_idx]["is_new"] = true
@@ -196,66 +195,266 @@ def generate_header()
   $decl.each_line do |line|
     header += " #{line}"
   end
-  header += "*/\n\n"
-end
+  header += "*/
 
-def generate_register_table(full_name)
-  reg_dict = $reg_info[full_name]
-  reg_str = ""
-  name_list = full_name.split(".")
-  cur_full_name = ""
-  #puts full_name
-  name_list.each_with_index do |elem, idx|
-    cur_full_name << "."  if idx > 0
-    cur_full_name << elem
-    #puts cur_full_name
-    reg_str += %Q!lua_getglobal(L, "#{elem}");\n! if idx == 0
-    reg_str += %Q!
-if(lua_istable(L, -1) == 0)
+"
+  header += <<-HEADER
+#include <string>
+#include <list>
+#include <cstring>
+#include <map>
+#include <iostream>
+#include "lua.hpp"
+#include "lua2cpp.hpp"
+
+void get_global_table(lua_State *lua_state, const char *nodes_name)
 {
-    luaL_newmetatable(L, "#{cur_full_name}");
-    lua_setglobal(L,
+    char buf[1024];
+    memcpy(buf, nodes_name, strlen(nodes_name) + 1);
+    char *p = buf;
+    const char *q = p;
+    int count = 0;
+
+    while(*p != 0)
+    {
+        if(*p == '.')
+        {
+            *p = 0;
+
+            if(count == 0)
+            {
+                lua_getglobal(lua_state, q);
+
+                if(lua_isnil(lua_state, -1))
+                {
+                    return;
+                }
+            }
+            else
+            {
+                lua_pushstring(lua_state, q);
+                lua_rawget(lua_state, -2);
+
+                if(lua_isnil(lua_state, -1))
+                {
+                    return;
+                }
+            }
+
+            q = p + 1;
+            ++count;
+        }
+
+        ++p;
+    }
+    
+    if(count == 0)
+    {
+        lua_getglobal(lua_state, q);
+
+        if(lua_isnil(lua_state, -1))
+        {
+            return;
+        }
+    }
+    else
+    {
+        lua_pushstring(lua_state, q);
+        lua_rawget(lua_state, -2);
+
+        if(lua_isnil(lua_state, -1))
+        {
+            return;
+        }
+    }
 }
-!
-  end
-  format_str = ""
-  reg_str.each_line {|line| format_str << "    #{line}"}
-  format_str
+
+void build_global_table(lua_State *lua_state, const char *nodes_name)
+{
+    char buf[1024];
+    memcpy(buf, nodes_name, strlen(nodes_name) + 1);
+    char *p = buf;
+    const char *q = p;
+    int count = 0;
+
+    while(*p != 0)
+    {
+        if(*p == '.')
+        {
+            *p = 0;
+
+            if(count == 0)
+            {
+                lua_getglobal(lua_state, q);
+
+                if(lua_isnil(lua_state, -1))
+                {
+                    lua_newtable(lua_state);
+                    lua_pushvalue(lua_state, -1);
+                    lua_setglobal(lua_state, q);
+                }
+            }
+            else
+            {
+                lua_pushstring(lua_state, q);
+                lua_rawget(lua_state, -2);
+
+                if(lua_isnil(lua_state, -1))
+                {
+                    lua_pop(lua_state,  1);
+                    lua_pushstring(lua_state, q);
+                    lua_newtable(lua_state);
+                    lua_pushvalue(lua_state, -1);
+                    lua_insert(lua_state, -4);
+                    lua_rawset(lua_state, -3);
+                    lua_pop(lua_state, 1);
+                }
+            }
+
+            q = p + 1;
+            ++count;
+        }
+
+        ++p;
+    }
+    
+    if(count == 0)
+    {
+        lua_getglobal(lua_state, q);
+
+        if(lua_isnil(lua_state, -1))
+        {
+            lua_newtable(lua_state);
+            lua_pushvalue(lua_state, -1);
+            lua_setglobal(lua_state, q);
+            lua_pushstring(lua_state, "__REG_NAME__");
+            lua_pushstring(lua_state, nodes_name);
+            lua_rawset(lua_state, -3);
+        }
+    }
+    else
+    {
+        lua_pushstring(lua_state, q);
+        lua_rawget(lua_state, -2);
+
+        if(lua_isnil(lua_state, -1))
+        {
+            lua_pop(lua_state,  1);
+            lua_pushstring(lua_state, q);
+            lua_newtable(lua_state);
+            lua_pushvalue(lua_state, -1);
+            lua_insert(lua_state, -4);
+            lua_rawset(lua_state, -3);
+            lua_pop(lua_state, 1);
+            lua_pushstring(lua_state, "__REG_NAME__");
+            lua_pushstring(lua_state, nodes_name);
+            lua_rawset(lua_state, -3);
+        }
+    }
+
+    lua_settop(lua_state, 0);
+}
+
+static std::map<std::string, std::list<std::string> > g_super_map;
+
+static int get_super_member(lua_State *lua_state)
+{
+    const char *key = lua_tostring(lua_state, -1);
+    lua_pop(lua_state, 1);
+    lua_pushstring(lua_state, "__REG_NAME__");
+    lua_rawget(lua_state, -2);
+
+    if(lua_isnil(lua_state, -1))
+    {
+        return 0;
+    }
+    
+    const char *reg_name = lua_tostring(lua_state, -1);
+    std::map<std::string, std::list<std::string> >::const_iterator iter = g_super_map.find(reg_name);
+    
+    if(iter == g_super_map.end())
+    {
+        return  0;
+    }
+    
+    const std::list<std::string> &super_list = iter->second;
+    
+    for(std::list<std::string>::const_iterator iter = super_list.begin(); iter != super_list.end(); ++iter)
+    {
+        std::string super_name = *iter;
+        get_global_table(lua_state, super_name.c_str());
+        lua_getfield(lua_state, -1, key);
+
+        if(!lua_isnil(lua_state, -1))
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+Script_Mgr* Script_Mgr::m_instance;
+
+Script_Mgr::Script_Mgr()
+{
+}
+
+Script_Mgr* Script_Mgr::instance()
+{
+    if(m_instance == NULL)
+    {
+        m_instance = new Script_Mgr;
+    }
+
+    return m_instance;
+}
+
+bool Script_Mgr::init()
+{
+    m_lua_state = luaL_newstate();
+    luaL_openlibs(m_lua_state);
+}
+
+lua_State* Script_Mgr::lua_state() const
+{
+    return m_lua_state;
+}
+
+int main()
+{
+}
+
+HEADER
 end
 
-def generate_cpp_file()
+def generate_file()
   gen_str = generate_header
-  reg_table_str = 'static int find_member_self_and_super(lua_State *L)
-{
-    assert(lua_istable(L, -1));
-    lua_getfield(L, -1, "full_name");
-}
-
-static void register_table(lua_State *L)
-{
-'
   $reg_info.each do |full_name, v|
-    reg_table_str += generate_register_table(full_name)
-    v["function"].each_value do |func_v|
-      gen_str += "static int lua_function"
-      v["namespace"].each_value do |ns_v|
-        gen_str += "____" + ns_v
-      end
-      v["class"].each_value do |cls_v|
-        gen_str += "___" + cls_v
-      end
-      gen_str += "__" + func_v["export_name"] + "(lua_State *L)"
-      gen_str += "\n{"
-      if func_v["is_new_function"]
-      end
-      gen_str += "\n    test;"
-      gen_str += "\n}\n\n"
-    end
+    puts full_name, v
   end
-  reg_table_str += "}"
-  File.open("./lua_cpp.cpp", "w").write(gen_str + reg_table_str)
+    
+  #   v["function"].each_value do |func_v|
+  #     gen_str += "static int lua_function"
+  #     v["namespace"].each_value do |ns_v|
+  #       gen_str += "____" + ns_v
+  #     end
+  #     v["class"].each_value do |cls_v|
+  #       gen_str += "___" + cls_v
+  #     end
+  #     gen_str += "__" + func_v["export_name"] + "(lua_State *L)"
+  #     gen_str += "\n{"
+  #     if func_v["is_new_function"]
+  #     end
+  #     gen_str += "\n    test;"
+  #     gen_str += "\n}\n\n"
+  #   end
+  # end
+  # reg_table_str += "}"
+  
+  File.open("./lua2cpp.cpp", "w").write(gen_str)
 end
 
-parse_lua_reg_file
-generate_cpp_file
-
+#parse and generate
+parse_file
+generate_file
