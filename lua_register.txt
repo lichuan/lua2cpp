@@ -1,9 +1,11 @@
+#include <string>
+#include <list>
+#include <cstring>
+#include <map>
 #include <iostream>
 #include "lua.hpp"
-#include <string>
-#include "lc.h"
+#include "lua2cpp.hpp"
 
-using namespace std;
 _
 {
     exe_script(string)

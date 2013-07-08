@@ -198,15 +198,8 @@ def generate_header()
   header += "*/
 
 "
+  header += $head
   header += <<-HEADER
-#include <string>
-#include <list>
-#include <cstring>
-#include <map>
-#include <iostream>
-#include "lua.hpp"
-#include "lua2cpp.hpp"
-
 void get_global_table(lua_State *lua_state, const char *nodes_name)
 {
     char buf[1024];
