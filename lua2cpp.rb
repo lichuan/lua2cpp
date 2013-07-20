@@ -139,7 +139,7 @@ end
 
 def parse_file
   $reg_info = {}
-  lua_reg_content = File.open("./lua_register.txt").readlines().join
+  lua_reg_content = File.open("./lua2cpp.txt").readlines().join
   match_list = /([^\{]*?)[^\n]*\n\{/.match(lua_reg_content)
   $head = match_list[1]
   body = lua_reg_content[$head.size..-1]
@@ -388,64 +388,115 @@ static int get_super_member(lua_State *lua_state)
     return 0;
 }
 
-Script_Mgr* Script_Mgr::m_instance;
-
-Script_Mgr::Script_Mgr()
-{
-}
-
-Script_Mgr* Script_Mgr::instance()
-{
-    if(m_instance == NULL)
-    {
-        m_instance = new Script_Mgr;
-    }
-
-    return m_instance;
-}
-
-bool Script_Mgr::init()
-{
-    m_lua_state = luaL_newstate();
-    luaL_openlibs(m_lua_state);
-}
-
-lua_State* Script_Mgr::lua_state() const
-{
-    return m_lua_state;
-}
-
-int main()
-{
-}
-
 HEADER
 end
 
+def generate_new_function(tbl, func)
+  gen_str = ""
+  cls_name = ""
+  tbl["namespace"].each_value do |ns|
+    cls_name << ns << "::"
+  end
+  tbl["class"].each_value do |cls|
+    cls_name << cls << "::"
+  end
+  cls_name = cls_name[0..-3]
+  gen_str += "
+    #{cls_name} *obj = new #{cls_name}"
+  puts func
+  puts cls_name
+  return gen_str
+end
+
+def generate_static_function(tbl, func)
+  gen_str = ""  
+  return gen_str
+end
+
+def generate_non_static_function(tbl, func)
+  gen_str = ""
+  return gen_str
+end
+
+def generate_is_get_function(tbl, func, is_static)
+  gen_str = ""
+  if func["ret_type"].has_key? "is_basic"
+    if func.has_key? "is_static"
+      if func["ret_type"]["name"] == "int32"
+        gen_str += "
+    int32 ret = #{func["name"]};
+    lua_pushinteger(lua_state, ret);
+
+    return 1;
+"
+      elsif func["ret_type"]["name"] == "uint32"
+        gen_str += "
+    uint32 ret = #{func["name"]};
+    lua_pushunsigned(lua_state, ret);
+
+    return 1;
+"
+      elsif func["ret_type"]["name"] == "number"
+        gen_str += "
+    double ret = #{func["name"]};
+    lua_pushnumber(lua_state, ret);
+
+    return 1;
+"
+      elsif func["ret_type"]["name"] == "string"
+        gen_str += "
+    std::string ret = #{func["name"]};
+    lua_pushstring(luak_state, ret.c_str());
+
+    return 1;
+"
+      end
+    end
+  end
+  return gen_str
+end
+
+def generate_is_set_function(tbl, func, is_static)
+  gen_str = ""
+  return gen_str
+end
+
 def generate_file()
+  $reg_func_tbl = {}
   gen_str = generate_header
   $reg_info.each do |full_name, v|
-    puts full_name, v
+    $reg_func_tbl[full_name] = []
+    #puts v
+    v["function"].each_value do|func|
+      gen_str += "static int "
+      gen_func_name = "lua"
+      v["namespace"].each_value do |ns|
+        gen_func_name += "____" + ns
+      end
+      v["class"].each_value do |cls|
+        gen_func_name += "___" + cls
+      end
+      gen_func_name += "__" + func["export_name"]
+      $reg_func_tbl[full_name].push([func["export_name"], gen_func_name])
+      gen_str += gen_func_name + "(lua_State *lua_state)"
+      gen_str += "
+{"
+      if func.has_key? "is_new"
+        gen_str += generate_new_function(v, func)
+      elsif func.has_key? "is_static"
+        gen_str += generate_static_function(v, func)
+      else
+        gen_str += generate_non_static_function(v, func)
+      end
+      gen_str += "}
+
+"
+    end
   end
-    
-  #   v["function"].each_value do |func_v|
-  #     gen_str += "static int lua_function"
-  #     v["namespace"].each_value do |ns_v|
-  #       gen_str += "____" + ns_v
-  #     end
-  #     v["class"].each_value do |cls_v|
-  #       gen_str += "___" + cls_v
-  #     end
-  #     gen_str += "__" + func_v["export_name"] + "(lua_State *L)"
-  #     gen_str += "\n{"
-  #     if func_v["is_new_function"]
-  #     end
-  #     gen_str += "\n    test;"
-  #     gen_str += "\n}\n\n"
-  #   end
-  # end
-  # reg_table_str += "}"
-  
+  gen_str += "
+int main(){}
+"
+
   File.open("./lua2cpp.cpp", "w").write(gen_str)
 end
 

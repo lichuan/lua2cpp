@@ -4,20 +4,23 @@
 #include <map>
 #include <iostream>
 #include "lua.hpp"
-#include "lua2cpp.hpp"
+
+typedef int int32;
+int32 ooopp = 2323;
 
 _
 {
     exe_script(string)
+    string ooopp
 }
 
 _arg.Cpp_Arg
 {
     ()
-    (int32, number,string)
+    (int32, _engine._memory.Base2&, number)
     int32 hp
     getd : d=_base.Base1
-    set_hp : static _engine._memory.Base3* hp=int32
+    set_hp : static _engine._memory.Base3*|gc| hp=int32
     get_v : int32 get_value()
     set_v : set_value(int32)
 }
@@ -32,9 +35,15 @@ _base.Base1
 
 _engine._memory.Base2
 {
+    ()
     pt_world_v()
     pt_world()
     _engine._memory.Base3 pt_arg_2(_arg.Cpp_Arg*)
+}
+
+_engine._memory.Base3.ICls
+{
+    string   get_name(int32)
 }
 
 _engine._memory.Base3

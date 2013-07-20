@@ -13,7 +13,9 @@
 #include <map>
 #include <iostream>
 #include "lua.hpp"
-#include "lua2cpp.hpp"
+
+typedef int int32;
+int32 ooopp = 2323;
 
 void get_global_table(lua_State *lua_state, const char *nodes_name)
 {
@@ -202,34 +204,78 @@ static int get_super_member(lua_State *lua_state)
     return 0;
 }
 
-Script_Mgr* Script_Mgr::m_instance;
+static int lua__exe_script(lua_State *lua_state)
+{}
 
-Script_Mgr::Script_Mgr()
+static int lua__ooopp(lua_State *lua_state)
+{}
+
+static int lua____arg___Cpp_Arg__new(lua_State *lua_state)
 {
-}
+    arg::Cpp_Arg *obj = new arg::Cpp_Arg}
 
-Script_Mgr* Script_Mgr::instance()
+static int lua____arg___Cpp_Arg__new1(lua_State *lua_state)
 {
-    if(m_instance == NULL)
-    {
-        m_instance = new Script_Mgr;
-    }
+    arg::Cpp_Arg *obj = new arg::Cpp_Arg}
 
-    return m_instance;
-}
+static int lua____arg___Cpp_Arg__hp(lua_State *lua_state)
+{}
 
-bool Script_Mgr::init()
+static int lua____arg___Cpp_Arg__getd(lua_State *lua_state)
+{}
+
+static int lua____arg___Cpp_Arg__set_hp(lua_State *lua_state)
+{}
+
+static int lua____arg___Cpp_Arg__get_v(lua_State *lua_state)
+{}
+
+static int lua____arg___Cpp_Arg__set_v(lua_State *lua_state)
+{}
+
+static int lua____base___Base1__new(lua_State *lua_state)
 {
-    m_lua_state = luaL_newstate();
-    luaL_openlibs(m_lua_state);
-}
+    base::Base1 *obj = new base::Base1}
 
-lua_State* Script_Mgr::lua_state() const
+static int lua____base___Base1__r3r3r(lua_State *lua_state)
+{}
+
+static int lua____base___Base1__IJ3RJ2(lua_State *lua_state)
+{}
+
+static int lua____base___Base1__get_info(lua_State *lua_state)
+{}
+
+static int lua____engine____memory___Base2__new(lua_State *lua_state)
 {
-    return m_lua_state;
-}
+    engine::memory::Base2 *obj = new engine::memory::Base2}
 
-int main()
-{
-}
+static int lua____engine____memory___Base2__pt_world_v(lua_State *lua_state)
+{}
 
+static int lua____engine____memory___Base2__pt_world(lua_State *lua_state)
+{}
+
+static int lua____engine____memory___Base2__pt_arg_2(lua_State *lua_state)
+{}
+
+static int lua____engine____memory___Base3___ICls__get_name(lua_State *lua_state)
+{}
+
+static int lua____engine____memory___Base3__get_name(lua_State *lua_state)
+{}
+
+static int lua___Derived___iii__pt_hello_v(lua_State *lua_state)
+{}
+
+static int lua___Derived___iii__pt_world(lua_State *lua_state)
+{}
+
+static int lua___Derived___iii__pt_arg_2(lua_State *lua_state)
+{}
+
+static int lua___Derived___iii__print_static(lua_State *lua_state)
+{}
+
+
+int main(){}
