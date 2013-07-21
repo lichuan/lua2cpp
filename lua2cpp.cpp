@@ -249,7 +249,12 @@ static int lua____arg___Cpp_Arg__new1(lua_State *lua_state)
 }
 
 static int lua____arg___Cpp_Arg__hp(lua_State *lua_state)
-{}
+{
+    int32 v = arg::Cpp_Arg::hp;
+    lua_pushinteger(lua_state, v);
+
+    return 1;
+}
 
 static int lua____arg___Cpp_Arg__getd(lua_State *lua_state)
 {}
@@ -310,6 +315,12 @@ static int lua____engine____memory___Base2__pt_arg_2(lua_State *lua_state)
 {}
 
 static int lua____engine____memory___Base3___ICls__get_name(lua_State *lua_state)
+{}
+
+static int lua____engine____memory____lll__name_str(lua_State *lua_state)
+{}
+
+static int lua____engine____memory____lll__get_name(lua_State *lua_state)
 {}
 
 static int lua____engine____memory___Base3__get_name(lua_State *lua_state)

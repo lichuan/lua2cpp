@@ -391,7 +391,7 @@ static int get_super_member(lua_State *lua_state)
 HEADER
 end
 
-def generate_ns_class_prefix(ns_tbl, cls_tbl)
+def generate_ns_class_name(ns_tbl, cls_tbl)
   gen_str = ""
   ns_tbl.each_value do |ns|
     gen_str << ns << "::"
@@ -405,55 +405,63 @@ def generate_ns_class_prefix(ns_tbl, cls_tbl)
   return gen_str
 end
 
+def generate_ns_class_prefix(ns_tbl, cls_tbl)
+  gen_str = ""
+  ns_tbl.each_value do |ns|
+    gen_str << ns << "::"
+  end
+  cls_tbl.each_value do |cls|
+    gen_str << cls << "::"
+  end
+  return gen_str
+end
+
 def generate_new_function(tbl, func)
   gen_str = ""
-  cls_name = generate_ns_class_prefix(tbl["namespace"], tbl["class"])
-  puts tbl
+  cls_name = generate_ns_class_name(tbl["namespace"], tbl["class"])
   idx = 1
-  new_str = []
+  func_str = []
   func["arg"].each_value do |arg|
-    #puts arg
     if arg.has_key? "is_basic"
-      puts arg
       case arg["name"]
       when "int32"
         gen_str += "
     int32 arg_#{idx} = lua_tointeger(lua_state, #{idx});"
-        new_str << "arg_#{idx}"
+        func_str << "arg_#{idx}"
       when "number"
         gen_str += "
     double arg_#{idx} = lua_tonumber(lua_state, #{idx});"
-        new_str << "arg_#{idx}"
+        func_str << "arg_#{idx}"
       when "uint32"
         gen_str += "
     uint32 arg_#{idx} = lua_tounsigned(lua_state, #{idx});"
-        new_str << "arg_#{idx}"
+        func_str << "arg_#{idx}"
       when "string"
         gen_str += "
     const char *arg_#{idx} = lua_tostring(lua_state, #{idx});"
-        new_str << "arg_#{idx}"
+        func_str << "arg_#{idx}"
       else        
       end
     elsif arg.has_key? "is_ptr"
       arg_cls_info = $reg_info[arg["name"]]
-      arg_cls = generate_ns_class_prefix(arg_cls_info["namespace"], arg_cls_info["class"])
+      arg_cls = generate_ns_class_name(arg_cls_info["namespace"], arg_cls_info["class"])
       gen_str += "
     uint32 *ud_#{idx} = (uint32*)lua_touserdata(lua_state, #{idx});
     uint32 gc_flag_#{idx} = *ud_#{idx};
     gc_flag_#{idx} = 0; /* not used in argument, only used in __gc function */
     ud_#{idx} += 1;
     #{arg_cls} *arg_#{idx} = *(#{arg_cls}**)ud_#{idx};"
-      new_str << "arg_#{idx}"
+      func_str << "arg_#{idx}"
     else
       arg_cls_info = $reg_info[arg["name"]]
-      arg_cls = generate_ns_class_prefix(arg_cls_info["namespace"], arg_cls_info["class"])
+      arg_cls = generate_ns_class_name(arg_cls_info["namespace"], arg_cls_info["class"])
       gen_str += "
     uint32 *ud_#{idx} = (uint32*)lua_touserdata(lua_state, #{idx});
     uint32 gc_flag_#{idx} = *ud_#{idx};
     gc_flag_#{idx} = 0; /* not used in argument, only used in __gc function */
     ud_#{idx} += 1;
     #{arg_cls} *arg_#{idx} = *(#{arg_cls}**)ud_#{idx};"
-      new_str << "*arg_#{idx}"
+      func_str << "*arg_#{idx}"
     end
     idx += 1
   end
@@ -463,7 +471,7 @@ def generate_new_function(tbl, func)
     uint32 &new_gc_flag = *new_udata;
     new_gc_flag = 1; /* need gc default */
     new_udata += 1;
-    (#{cls_name}**)new_udata = new #{cls_name}(#{new_str.join(', ')});
+    (#{cls_name}**)new_udata = new #{cls_name}(#{func_str.join(', ')});
     get_global_table(lua_state, "#{tbl["name"]}");
     lua_setmetatable(lua_state, -2);
 
@@ -472,55 +480,58 @@ def generate_new_function(tbl, func)
   return gen_str
 end
 
-def generate_static_function(tbl, func)
+def generate_function(tbl, func)
+  gen_str = ""
+  return gen_str
+end
+
+def generate_get_function(tbl, func)
+  puts func
+  ns_cls_prefix = generate_ns_class_prefix(tbl["namespace"], tbl["class"])
+  puts ns_cls_prefix
   gen_str = ""  
-  return gen_str
-end
-
-def generate_non_static_function(tbl, func)
-  gen_str = ""
-  return gen_str
-end
-
-def generate_is_get_function(tbl, func, is_static)
-  gen_str = ""
-  if func["ret_type"].has_key? "is_basic"
-    if func.has_key? "is_static"
-      if func["ret_type"]["name"] == "int32"
+  if func.has_key? "is_static"
+    if func["ret_type"].has_key? "is_basic"
+      case func["ret_type"]["name"]
+      when "int32"
         gen_str += "
-    int32 ret = #{func["name"]};
-    lua_pushinteger(lua_state, ret);
+    int32 v = #{ns_cls_prefix}#{func["name"]};
+    lua_pushinteger(lua_state, v);
 
     return 1;
 "
-      elsif func["ret_type"]["name"] == "uint32"
+      when "uint32"
         gen_str += "
-    uint32 ret = #{func["name"]};
-    lua_pushunsigned(lua_state, ret);
+    uint32 v = #{ns_cls_prefix}#{func["name"]};
+    lua_pushunsigned(lua_state, v);
 
     return 1;
 "
-      elsif func["ret_type"]["name"] == "number"
+      when "number"
         gen_str += "
-    double ret = #{func["name"]};
-    lua_pushnumber(lua_state, ret);
+    double v = #{ns_cls_prefix}#{func["name"]};
+    lua_pushnumber(lua_state, v);
 
     return 1;
 "
-      elsif func["ret_type"]["name"] == "string"
+      when "string"
         gen_str += "
-    std::string ret = #{func["name"]};
-    lua_pushstring(luak_state, ret.c_str());
+    std::string v = #{ns_cls_prefix}#{func["name"]};
+    lua_pushstring(lua_state, v.c_str());
 
     return 1;
 "
+      else
+      end
+    elsif func["ret_type"].has_key? "is_ptr"
+      if func["ret_type"].has_key? "gc"
       end
     end
   end
   return gen_str
 end
 
-def generate_is_set_function(tbl, func, is_static)
+def generate_set_function(tbl, func)
   gen_str = ""
   return gen_str
 end
@@ -547,10 +558,12 @@ def generate_file()
 {"
       if func.has_key? "is_new"
         gen_str += generate_new_function(v, func)
-      elsif func.has_key? "is_static"
-        gen_str += generate_static_function(v, func)
+      elsif func.has_key? "is_get"
+        gen_str += generate_get_function(v, func)
+      elsif func.has_key? "is_set"
+        gen_str += generate_set_function(v, func)
       else
-        gen_str += generate_non_static_function(v, func)
+        gen_str += generate_function(v, func)
       end
       gen_str += "}
 
