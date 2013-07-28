@@ -320,11 +320,7 @@ void build_global_table(lua_State *lua_state, const char *nodes_name)
         if(lua_isnil(lua_state, -1))
         {
             lua_newtable(lua_state);
-            lua_pushvalue(lua_state, -1);
             lua_setglobal(lua_state, q);
-            lua_pushstring(lua_state, "__REG_NAME__");
-            lua_pushstring(lua_state, nodes_name);
-            lua_rawset(lua_state, -3);
         }
     }
     else
@@ -337,58 +333,12 @@ void build_global_table(lua_State *lua_state, const char *nodes_name)
             lua_pop(lua_state,  1);
             lua_pushstring(lua_state, q);
             lua_newtable(lua_state);
-            lua_pushvalue(lua_state, -1);
-            lua_insert(lua_state, -4);
-            lua_rawset(lua_state, -3);
-            lua_pop(lua_state, 1);
-            lua_pushstring(lua_state, "__REG_NAME__");
-            lua_pushstring(lua_state, nodes_name);
             lua_rawset(lua_state, -3);
         }
     }
 
     lua_settop(lua_state, 0);
 }
-
-static std::map<std::string, std::list<std::string> > g_super_map;
-
-static int get_super_member(lua_State *lua_state)
-{
-    const char *key = lua_tostring(lua_state, -1);
-    lua_pop(lua_state, 1);
-    lua_pushstring(lua_state, "__REG_NAME__");
-    lua_rawget(lua_state, -2);
-
-    if(lua_isnil(lua_state, -1))
-    {
-        return 0;
-    }
-    
-    const char *reg_name = lua_tostring(lua_state, -1);
-    std::map<std::string, std::list<std::string> >::const_iterator iter = g_super_map.find(reg_name);
-    
-    if(iter == g_super_map.end())
-    {
-        return  0;
-    }
-    
-    const std::list<std::string> &super_list = iter->second;
-    
-    for(std::list<std::string>::const_iterator iter = super_list.begin(); iter != super_list.end(); ++iter)
-    {
-        std::string super_name = *iter;
-        get_global_table(lua_state, super_name.c_str());
-        lua_getfield(lua_state, -1, key);
-
-        if(!lua_isnil(lua_state, -1))
-        {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
 HEADER
 end
 
@@ -452,18 +402,14 @@ def generate_new_function(tbl, func)
       arg_cls = generate_ns_class_name(arg_cls_info["namespace"], arg_cls_info["class"])
       gen_str += "
     uint32 *ud_#{idx} = (uint32*)lua_touserdata(lua_state, #{idx});
-    uint32 gc_flag_#{idx} = *ud_#{idx};
-    gc_flag_#{idx} = 0; /* not used in argument, only used in __gc function */
     ud_#{idx} += 1;
     #{arg_cls} *arg_#{idx} = *(#{arg_cls}**)ud_#{idx};"
       func_str << "arg_#{idx}"
-    else # is_ref
+    else #is_ref
       arg_cls_info = $reg_info[arg["name"]]
       arg_cls = generate_ns_class_name(arg_cls_info["namespace"], arg_cls_info["class"])
       gen_str += "
     uint32 *ud_#{idx} = (uint32*)lua_touserdata(lua_state, #{idx});
-    uint32 gc_flag_#{idx} = *ud_#{idx};
-    gc_flag_#{idx} = 0; /* not used in argument, only used in __gc function */
     ud_#{idx} += 1;
     #{arg_cls} *arg_#{idx} = *(#{arg_cls}**)ud_#{idx};"
       func_str << "*arg_#{idx}"
@@ -474,7 +420,7 @@ def generate_new_function(tbl, func)
     lua_settop(lua_state, 0);
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{cls_name}*));
     uint32 &gc_flag = *udata;
-    gc_flag = 1; /* need gc default */
+    gc_flag = 1; /* need gc default in constructor */
     udata += 1;
     *(#{cls_name}**)udata = new #{cls_name}(#{func_str.join(', ')});
     get_global_table(lua_state, "#{tbl["name"]}");
@@ -492,8 +438,9 @@ end
 
 def generate_get_function(tbl, func)
   ns_cls_prefix = generate_ns_class_prefix(tbl["namespace"], tbl["class"])
+  ns_cls_name = generate_ns_class_name(tbl["namespace"], tbl["class"])
   gen_str = ""  
-  if func.has_key? "is_static"
+  if func.has_key? "is_static" or tbl["class"].empty?
     if func["ret_type"].has_key? "is_basic"
       case func["ret_type"]["name"]
       when "bool"
@@ -537,18 +484,128 @@ def generate_get_function(tbl, func)
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
       gen_str += "
-    #{ns_cls_name} *v = #{ns_cls_prefix}#{func["name"]};
+    const #{ns_cls_name} *v = #{ns_cls_prefix}#{func["name"]};
     uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("gc") ? 1 : 0};
+    udata += 1;
+    *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+
+    return 1;
+"
+    elsif func["ret_type"].has_key? "is_ref"
+      ret_type_info = $reg_info[func["ret_type"]["name"]]
+      ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
+      gen_str += "
+    const #{ns_cls_name} *v = &#{ns_cls_prefix}#{func["name"]};
+    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 &gc_flag = *udata;
+    gc_flag = #{func["ret_type"].has_key?("gc") ? 1 : 0};
+    udata += 1;
+    *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+
+    return 1;
+"
+    else
+      ret_type_info = $reg_info[func["ret_type"]["name"]]
+      ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
+      gen_str += "
+    #{ns_cls_name} *v = new #{ns_cls_name};
+    *v = #{ns_cls_prefix}#{func["name"]};
+    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 &gc_flag = *udata;
+    gc_flag = 1;
     udata += 1;
     *(#{ns_cls_name}**)udata = v;
 
     return 1;
 "
     end
-  else
-    #no static
+  else #non-static
+    gen_str += "
+    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
+    udata += 1;
+    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata;"
+    if func["ret_type"].has_key? "is_basic"
+      case func["ret_type"]["name"]
+      when "bool"
+        gen_str += "
+    bool v = obj->#{func["name"]};
+    lua_pushboolean(lua_state, v ? 1 : 0);
+
+    return 1;
+"
+      when "int32"
+        gen_str += "
+    int32 v = obj->#{func["name"]};
+    lua_pushinteger(lua_state, v);
+
+    return 1;
+"
+      when "uint32"
+        gen_str += "
+    uint32 v = obj->#{func["name"]};
+    lua_pushunsigned(lua_state, v);
+
+    return 1;
+"
+      when "number"
+        gen_str += "
+    double v = obj->#{func["name"]};
+    lua_pushnumber(lua_state, v);
+
+    return 1;
+"
+      when "string"
+        gen_str += "
+    std::string v = obj->#{func["name"]};
+    lua_pushstring(lua_state, v.c_str());
+
+    return 1;
+"
+      else
+      end
+    elsif func["ret_type"].has_key? "is_ptr"
+      ret_type_info = $reg_info[func["ret_type"]["name"]]
+      ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
+      gen_str += "
+    const #{ns_cls_name} *v = obj->#{func["name"]};
+    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 &gc_flag = *udata;
+    gc_flag = #{func["ret_type"].has_key?("gc") ? 1 : 0};
+    udata += 1;
+    *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+
+    return 1;
+"
+    elsif func["ret_type"].has_key? "is_ref"
+      ret_type_info = $reg_info[func["ret_type"]["name"]]
+      ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
+      gen_str += "
+    const #{ns_cls_name} *v = &obj->#{func["name"]};
+    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 &gc_flag = *udata;
+    gc_flag = #{func["ret_type"].has_key?("gc") ? 1 : 0};
+    udata += 1;
+    *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+
+    return 1;
+"
+    else
+      ret_type_info = $reg_info[func["ret_type"]["name"]]
+      ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
+      gen_str += "
+    #{ns_cls_name} *v = new #{ns_cls_name};
+    *v = obj->#{func["name"]};
+    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 &gc_flag = *udata;
+    gc_flag = 1;
+    udata += 1;
+    *(#{ns_cls_name}**)udata = v;
+
+    return 1;
+"
+    end
   end
   return gen_str
 end

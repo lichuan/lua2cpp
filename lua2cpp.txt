@@ -47,14 +47,14 @@ _engine._memory.Base3.ICls
 
 _engine._memory._lll
 {
-static _base.Base1|gc| name_str
+ _base.Base1&|gc| name_str
     string   get_name(int32)
 }
 
 _engine._memory.Base3
 {
     string   get_name(int32)
-    static _gabriel.b1* bb1
+     _gabriel.b1* bb1
 }
 
 _gabriel.b1
