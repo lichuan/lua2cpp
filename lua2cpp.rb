@@ -22,7 +22,7 @@ def parse_namespace_class(tbl_namespace, tbl_class, full_name)
 end
 
 def is_basic_type(type_str)
-  ["string", "int32", "number", "uint32"].each { |basic_type| return true if type_str == basic_type }
+  ["string", "int32", "number", "uint32", "bool"].each { |basic_type| return true if type_str == basic_type }
   false
 end
 
@@ -54,11 +54,11 @@ def parse_type(tbl_type, type_str, is_ret)
   return if type_str.empty?
   match_list = /([^\s\*\|\&]+)(\*|\&)?(\|gc\|)?/.match(type_str)
   if match_list.nil?
-    error_msg("type invalid in #{type_str}")
+    error_msg("type invalid: #{type_str}")
   else
     if match_list[3] == "|gc|"
       if not is_ret
-        error_msg("function parameter should not be |gc| in #{type_str}")
+        error_msg("function parameter should not be |gc|: #{type_str}")
       end
     end
     type = match_list[1]
@@ -66,10 +66,10 @@ def parse_type(tbl_type, type_str, is_ret)
     if is_basic_type type
       tbl_type["is_basic"] = true
       ["*", "|gc|", "&"].each do |v|
-        error_msg("basic type does not support #{v} in #{type_str}") if match_list[2] == v or match_list[3] == v
+        error_msg("basic type does not support #{v}: #{type_str}") if match_list[2] == v or match_list[3] == v
       end
     elsif not $reg_info.has_key?(match_list[1])
-      error_msg("type #{match_list[1]} is not exist in #{type_str}")
+      error_msg("type #{match_list[1]} is not registered: #{type_str}")
     else
       if match_list[2] == "*"
         tbl_type["is_ptr"] = true
@@ -108,7 +108,7 @@ def parse_function_3(tbl_func, func_str)
   if match_list.nil?
     match_list = /(^[^\s=]+) +([^\s]+)/.match(func_str)
     if match_list.nil?
-      error_msg("function is invalid in #{func_str}")
+      error_msg("function is invalid: #{func_str}")
     else
       parse_type(tbl_func["ret_type"], match_list[1], true)
       tbl_func["is_get"] = true
@@ -118,7 +118,7 @@ def parse_function_3(tbl_func, func_str)
       end
     end
   elsif not tbl_func.has_key?("export_name")
-    error_msg("no export name assign in #{func_str}")
+    error_msg("no export name assign: #{func_str}")
   else
     tbl_func["is_set"] = true
     tbl_func["name"] = match_list[2]
@@ -164,6 +164,7 @@ def parse_file
         super_class_list = match_list[1]
         super_class_list.scan(/([^\s,]+)/) do |arr|
           super_class = arr[0]
+          error_msg("#{super_class} is not registered: #{part1}") if not $reg_info.has_key?(super_class)
           tbl["super"][tbl["super"].size] = super_class
         end
       end
@@ -424,6 +425,10 @@ def generate_new_function(tbl, func)
   func["arg"].each_value do |arg|
     if arg.has_key? "is_basic"
       case arg["name"]
+      when "bool"
+        gen_str += "
+    bool arg_#{idx} = lua_toboolean(lua_state, #{idx}) > 0 ? true : false;"
+        func_str << "arg_#{idx}"
       when "int32"
         gen_str += "
     int32 arg_#{idx} = lua_tointeger(lua_state, #{idx});"
@@ -452,7 +457,7 @@ def generate_new_function(tbl, func)
     ud_#{idx} += 1;
     #{arg_cls} *arg_#{idx} = *(#{arg_cls}**)ud_#{idx};"
       func_str << "arg_#{idx}"
-    else
+    else # is_ref
       arg_cls_info = $reg_info[arg["name"]]
       arg_cls = generate_ns_class_name(arg_cls_info["namespace"], arg_cls_info["class"])
       gen_str += "
@@ -467,11 +472,11 @@ def generate_new_function(tbl, func)
   end
   gen_str += %Q{
     lua_settop(lua_state, 0);
-    uint32 *new_udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{cls_name}*));
-    uint32 &new_gc_flag = *new_udata;
-    new_gc_flag = 1; /* need gc default */
-    new_udata += 1;
-    (#{cls_name}**)new_udata = new #{cls_name}(#{func_str.join(', ')});
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{cls_name}*));
+    uint32 &gc_flag = *udata;
+    gc_flag = 1; /* need gc default */
+    udata += 1;
+    *(#{cls_name}**)udata = new #{cls_name}(#{func_str.join(', ')});
     get_global_table(lua_state, "#{tbl["name"]}");
     lua_setmetatable(lua_state, -2);
 
@@ -486,13 +491,18 @@ def generate_function(tbl, func)
 end
 
 def generate_get_function(tbl, func)
-  puts func
   ns_cls_prefix = generate_ns_class_prefix(tbl["namespace"], tbl["class"])
-  puts ns_cls_prefix
   gen_str = ""  
   if func.has_key? "is_static"
     if func["ret_type"].has_key? "is_basic"
       case func["ret_type"]["name"]
+      when "bool"
+        gen_str += "
+    bool v = #{ns_cls_prefix}#{func["name"]};
+    lua_pushboolean(lua_state, v ? 1 : 0);
+
+    return 1;
+"
       when "int32"
         gen_str += "
     int32 v = #{ns_cls_prefix}#{func["name"]};
@@ -524,9 +534,21 @@ def generate_get_function(tbl, func)
       else
       end
     elsif func["ret_type"].has_key? "is_ptr"
-      if func["ret_type"].has_key? "gc"
-      end
+      ret_type_info = $reg_info[func["ret_type"]["name"]]
+      ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
+      gen_str += "
+    #{ns_cls_name} *v = #{ns_cls_prefix}#{func["name"]};
+    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 &gc_flag = *udata;
+    gc_flag = #{func["ret_type"].has_key?("gc") ? 1 : 0};
+    udata += 1;
+    *(#{ns_cls_name}**)udata = v;
+
+    return 1;
+"
     end
+  else
+    #no static
   end
   return gen_str
 end
@@ -536,13 +558,37 @@ def generate_set_function(tbl, func)
   return gen_str
 end
 
+def merge_super_function_to_derived()
+  $reg_info.each_value do |v|
+    v["super"].each_value do |super_cls|
+      merge_super_function_to_derived_impl(v["function"], $reg_info[super_cls])
+    end
+  end
+end
+
+def merge_super_function_to_derived_impl(derived_func_tbl, super_info)
+  super_info["super"].each_value do |super_cls|
+    merge_super_function_to_derived_impl(super_info["function"], $reg_info[super_cls])
+  end
+  already_exist_functions = []
+  derived_func_tbl.each_value do |func|
+    next if func.has_key? "is_static" or func.has_key? "is_new"
+    already_exist_functions << func["export_name"]
+  end
+  super_info["function"].each_value do |func|
+    next if func.has_key? "is_static" or func.has_key? "is_new"
+    next if already_exist_functions.include? func["export_name"]
+    derived_func_tbl[derived_func_tbl.size] = func
+  end
+end
+
 def generate_file()
   $reg_func_tbl = {}
   gen_str = generate_header
+  merge_super_function_to_derived
   $reg_info.each do |full_name, v|
     $reg_func_tbl[full_name] = []
-    #puts v
-    v["function"].each_value do|func|
+    v["function"].each_value do |func|
       gen_str += "static int "
       gen_func_name = "lua"
       v["namespace"].each_value do |ns|

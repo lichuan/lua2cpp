@@ -16,6 +16,7 @@ _arg.Cpp_Arg
     ()
     (int32, _engine._memory.Base2&*, _arg.Cpp_Arg*, number,string)
     static int32 hp
+    int32 id
     getd : d=_base.Base1
     set_hp : static _engine._memory.Base3*|gc| hp=int32
     get_v : int32 get_value()
@@ -25,6 +26,7 @@ _arg.Cpp_Arg
 _base.Base1
 {
     ()
+    int32 owerid
     r3r3r : pt_hello_v()
     IJ3RJ2 : pt_arg_1(_arg.Cpp_Arg*)
     get_info(_arg.Cpp_Arg&, _engine._memory.Base3*)
@@ -45,20 +47,41 @@ _engine._memory.Base3.ICls
 
 _engine._memory._lll
 {
-static _base.Base1*|gc| name_str
+static _base.Base1|gc| name_str
     string   get_name(int32)
 }
 
 _engine._memory.Base3
 {
     string   get_name(int32)
+    static _gabriel.b1* bb1
 }
 
-Derived extends _base.Base1,engine._memory.Base2
+_gabriel.b1
+{
+    int32 b1_id
+    set_b1_name : modify_name(string)
+    print_b1 : pt_b1()
+}
+
+_gabriel.b2
+{
+    string b2_name
+    static string last_name()
+    uint32 uniqued_id()
+}
+
+Derived extends _gabriel.b1
 {
     (int32)
-    static pt_hello_v()
+    bool b_value
+    pt_hello_v()
     pt_world()
     pt_arg_2(_arg.Cpp_Arg*)
     static print_static(string)
+}
+
+Der2 extends Derived, _gabriel.b2
+{
+(bool, int32, string)
 }
