@@ -172,7 +172,8 @@ static int lua____arg___Cpp_Arg__new(lua_State *lua_state)
     udata += 1;
     *(arg::Cpp_Arg**)udata = new arg::Cpp_Arg();
     get_global_table(lua_state, "_arg.Cpp_Arg");
-    lua_setmetatable(lua_state, -2);
+    lua_setmetatable(lua_state, 1);
+    lua_settop(lua_state, 1);
 
     return 1;
 }
@@ -195,7 +196,8 @@ static int lua____arg___Cpp_Arg__new1(lua_State *lua_state)
     udata += 1;
     *(arg::Cpp_Arg**)udata = new arg::Cpp_Arg(arg_1, *arg_2, arg_3, arg_4, arg_5);
     get_global_table(lua_state, "_arg.Cpp_Arg");
-    lua_setmetatable(lua_state, -2);
+    lua_setmetatable(lua_state, 1);
+    lua_settop(lua_state, 1);
 
     return 1;
 }
@@ -233,9 +235,9 @@ static int lua____arg___Cpp_Arg__set_hp(lua_State *lua_state)
 
 static int lua____arg___Cpp_Arg__get_v(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    arg::Cpp_Arg *obj = *(arg::Cpp_Arg**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    arg::Cpp_Arg *obj = *(arg::Cpp_Arg**)udata_self;
     lua_settop(lua_state, 0);
     int32 v = obj->get_value();
     lua_pushinteger(lua_state, v);
@@ -245,9 +247,9 @@ static int lua____arg___Cpp_Arg__get_v(lua_State *lua_state)
 
 static int lua____arg___Cpp_Arg__set_v(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    arg::Cpp_Arg *obj = *(arg::Cpp_Arg**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    arg::Cpp_Arg *obj = *(arg::Cpp_Arg**)udata_self;
     int32 arg_1 = lua_tointeger(lua_state, 2);
     lua_settop(lua_state, 0);
     obj->set_value(arg_1);
@@ -279,16 +281,17 @@ static int lua____base___Base1__new(lua_State *lua_state)
     udata += 1;
     *(base::Base1**)udata = new base::Base1();
     get_global_table(lua_state, "_base.Base1");
-    lua_setmetatable(lua_state, -2);
+    lua_setmetatable(lua_state, 1);
+    lua_settop(lua_state, 1);
 
     return 1;
 }
 
 static int lua____base___Base1__owerid(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    base::Base1 *obj = *(base::Base1**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    base::Base1 *obj = *(base::Base1**)udata_self;
     int32 v = obj->owerid;
     lua_pushinteger(lua_state, v);
 
@@ -297,9 +300,9 @@ static int lua____base___Base1__owerid(lua_State *lua_state)
 
 static int lua____base___Base1__r3r3r(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    base::Base1 *obj = *(base::Base1**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    base::Base1 *obj = *(base::Base1**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_hello_v();
 
@@ -308,9 +311,9 @@ static int lua____base___Base1__r3r3r(lua_State *lua_state)
 
 static int lua____base___Base1__IJ3RJ2(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    base::Base1 *obj = *(base::Base1**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    base::Base1 *obj = *(base::Base1**)udata_self;
     uint32 *udata_1 = (uint32*)lua_touserdata(lua_state, 2);
     udata_1 += 1;
     arg::Cpp_Arg *arg_1 = *(arg::Cpp_Arg**)udata_1;
@@ -322,9 +325,9 @@ static int lua____base___Base1__IJ3RJ2(lua_State *lua_state)
 
 static int lua____base___Base1__get_info(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    base::Base1 *obj = *(base::Base1**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    base::Base1 *obj = *(base::Base1**)udata_self;
     uint32 *udata_1 = (uint32*)lua_touserdata(lua_state, 2);
     udata_1 += 1;
     arg::Cpp_Arg *arg_1 = *(arg::Cpp_Arg**)udata_1;
@@ -361,16 +364,17 @@ static int lua____engine____memory___Base2__new(lua_State *lua_state)
     udata += 1;
     *(engine::memory::Base2**)udata = new engine::memory::Base2();
     get_global_table(lua_state, "_engine._memory.Base2");
-    lua_setmetatable(lua_state, -2);
+    lua_setmetatable(lua_state, 1);
+    lua_settop(lua_state, 1);
 
     return 1;
 }
 
 static int lua____engine____memory___Base2__pt_world_v(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    engine::memory::Base2 *obj = *(engine::memory::Base2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    engine::memory::Base2 *obj = *(engine::memory::Base2**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_world_v();
 
@@ -379,9 +383,9 @@ static int lua____engine____memory___Base2__pt_world_v(lua_State *lua_state)
 
 static int lua____engine____memory___Base2__pt_world(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    engine::memory::Base2 *obj = *(engine::memory::Base2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    engine::memory::Base2 *obj = *(engine::memory::Base2**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_world();
 
@@ -390,16 +394,16 @@ static int lua____engine____memory___Base2__pt_world(lua_State *lua_state)
 
 static int lua____engine____memory___Base2__pt_arg_2(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    engine::memory::Base2 *obj = *(engine::memory::Base2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    engine::memory::Base2 *obj = *(engine::memory::Base2**)udata_self;
     uint32 *udata_1 = (uint32*)lua_touserdata(lua_state, 2);
     udata_1 += 1;
     arg::Cpp_Arg *arg_1 = *(arg::Cpp_Arg**)udata_1;
     lua_settop(lua_state, 0);
     engine::memory::Base3 *v = new engine::memory::Base3;
     *v = obj->pt_arg_2(arg_1);
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(engine::memory::Base3*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(engine::memory::Base3*));
     uint32 &gc_flag = *udata;
     gc_flag = 1;
     udata += 1;
@@ -425,9 +429,9 @@ static int lua____engine____memory___Base2__garbage_colloect(lua_State *lua_stat
 
 static int lua____engine____memory___Base3___ICls__get_name(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    engine::memory::Base3::ICls *obj = *(engine::memory::Base3::ICls**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    engine::memory::Base3::ICls *obj = *(engine::memory::Base3::ICls**)udata_self;
     int32 arg_1 = lua_tointeger(lua_state, 2);
     lua_settop(lua_state, 0);
     std::string v = obj->get_name(arg_1);
@@ -454,7 +458,7 @@ static int lua____engine____memory___Base3___ICls__garbage_colloect(lua_State *l
 static int lua____engine____memory____lll__name_str(lua_State *lua_state)
 {
     const base::Base1 *v = &engine::memory::lll::name_str;
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(base::Base1*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(base::Base1*));
     uint32 &gc_flag = *udata;
     gc_flag = 1;
     udata += 1;
@@ -475,9 +479,9 @@ static int lua____engine____memory____lll__get_name(lua_State *lua_state)
 
 static int lua____engine____memory___Base3__get_name(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    engine::memory::Base3 *obj = *(engine::memory::Base3**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    engine::memory::Base3 *obj = *(engine::memory::Base3**)udata_self;
     int32 arg_1 = lua_tointeger(lua_state, 2);
     lua_settop(lua_state, 0);
     std::string v = obj->get_name(arg_1);
@@ -488,11 +492,11 @@ static int lua____engine____memory___Base3__get_name(lua_State *lua_state)
 
 static int lua____engine____memory___Base3__bb1(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    engine::memory::Base3 *obj = *(engine::memory::Base3**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    engine::memory::Base3 *obj = *(engine::memory::Base3**)udata_self;
     const gabriel::b1 *v = obj->bb1;
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(gabriel::b1*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(gabriel::b1*));
     uint32 &gc_flag = *udata;
     gc_flag = 0;
     udata += 1;
@@ -518,9 +522,9 @@ static int lua____engine____memory___Base3__garbage_colloect(lua_State *lua_stat
 
 static int lua____gabriel___b1__b1_id(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    gabriel::b1 *obj = *(gabriel::b1**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    gabriel::b1 *obj = *(gabriel::b1**)udata_self;
     int32 v = obj->b1_id;
     lua_pushinteger(lua_state, v);
 
@@ -529,9 +533,9 @@ static int lua____gabriel___b1__b1_id(lua_State *lua_state)
 
 static int lua____gabriel___b1__set_b1_name(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    gabriel::b1 *obj = *(gabriel::b1**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    gabriel::b1 *obj = *(gabriel::b1**)udata_self;
     const char *arg_1 = lua_tostring(lua_state, 2);
     lua_settop(lua_state, 0);
     obj->modify_name(arg_1);
@@ -541,9 +545,9 @@ static int lua____gabriel___b1__set_b1_name(lua_State *lua_state)
 
 static int lua____gabriel___b1__print_b1(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    gabriel::b1 *obj = *(gabriel::b1**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    gabriel::b1 *obj = *(gabriel::b1**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_b1();
 
@@ -567,9 +571,9 @@ static int lua____gabriel___b1__garbage_colloect(lua_State *lua_state)
 
 static int lua____gabriel___b2__b2_name(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    gabriel::b2 *obj = *(gabriel::b2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    gabriel::b2 *obj = *(gabriel::b2**)udata_self;
     std::string v = obj->b2_name;
     lua_pushstring(lua_state, v.c_str());
 
@@ -587,9 +591,9 @@ static int lua____gabriel___b2__last_name(lua_State *lua_state)
 
 static int lua____gabriel___b2__uniqued_id(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    gabriel::b2 *obj = *(gabriel::b2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    gabriel::b2 *obj = *(gabriel::b2**)udata_self;
     lua_settop(lua_state, 0);
     uint32 v = obj->uniqued_id();
     lua_pushunsigned(lua_state, v);
@@ -622,16 +626,17 @@ static int lua___Derived__new(lua_State *lua_state)
     udata += 1;
     *(Derived**)udata = new Derived(arg_1);
     get_global_table(lua_state, "Derived");
-    lua_setmetatable(lua_state, -2);
+    lua_setmetatable(lua_state, 1);
+    lua_settop(lua_state, 1);
 
     return 1;
 }
 
 static int lua___Derived__b_value(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Derived *obj = *(Derived**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Derived *obj = *(Derived**)udata_self;
     bool v = obj->b_value;
     lua_pushboolean(lua_state, v ? 1 : 0);
 
@@ -640,9 +645,9 @@ static int lua___Derived__b_value(lua_State *lua_state)
 
 static int lua___Derived__pt_hello_v(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Derived *obj = *(Derived**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Derived *obj = *(Derived**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_hello_v();
 
@@ -651,9 +656,9 @@ static int lua___Derived__pt_hello_v(lua_State *lua_state)
 
 static int lua___Derived__pt_world(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Derived *obj = *(Derived**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Derived *obj = *(Derived**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_world();
 
@@ -662,9 +667,9 @@ static int lua___Derived__pt_world(lua_State *lua_state)
 
 static int lua___Derived__pt_arg_2(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Derived *obj = *(Derived**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Derived *obj = *(Derived**)udata_self;
     uint32 *udata_1 = (uint32*)lua_touserdata(lua_state, 2);
     udata_1 += 1;
     arg::Cpp_Arg *arg_1 = *(arg::Cpp_Arg**)udata_1;
@@ -688,9 +693,9 @@ static int lua___Derived__print_static(lua_State *lua_state)
 
 static int lua___Derived__b1_id(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Derived *obj = *(Derived**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Derived *obj = *(Derived**)udata_self;
     int32 v = obj->b1_id;
     lua_pushinteger(lua_state, v);
 
@@ -699,9 +704,9 @@ static int lua___Derived__b1_id(lua_State *lua_state)
 
 static int lua___Derived__set_b1_name(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Derived *obj = *(Derived**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Derived *obj = *(Derived**)udata_self;
     const char *arg_1 = lua_tostring(lua_state, 2);
     lua_settop(lua_state, 0);
     obj->modify_name(arg_1);
@@ -711,9 +716,9 @@ static int lua___Derived__set_b1_name(lua_State *lua_state)
 
 static int lua___Derived__print_b1(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Derived *obj = *(Derived**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Derived *obj = *(Derived**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_b1();
 
@@ -747,16 +752,17 @@ static int lua___Der2__new(lua_State *lua_state)
     udata += 1;
     *(Der2**)udata = new Der2(arg_1, arg_2, arg_3);
     get_global_table(lua_state, "Der2");
-    lua_setmetatable(lua_state, -2);
+    lua_setmetatable(lua_state, 1);
+    lua_settop(lua_state, 1);
 
     return 1;
 }
 
 static int lua___Der2__b_value(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Der2 *obj = *(Der2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Der2 *obj = *(Der2**)udata_self;
     bool v = obj->b_value;
     lua_pushboolean(lua_state, v ? 1 : 0);
 
@@ -765,9 +771,9 @@ static int lua___Der2__b_value(lua_State *lua_state)
 
 static int lua___Der2__pt_hello_v(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Der2 *obj = *(Der2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Der2 *obj = *(Der2**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_hello_v();
 
@@ -776,9 +782,9 @@ static int lua___Der2__pt_hello_v(lua_State *lua_state)
 
 static int lua___Der2__pt_world(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Der2 *obj = *(Der2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Der2 *obj = *(Der2**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_world();
 
@@ -787,9 +793,9 @@ static int lua___Der2__pt_world(lua_State *lua_state)
 
 static int lua___Der2__pt_arg_2(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Der2 *obj = *(Der2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Der2 *obj = *(Der2**)udata_self;
     uint32 *udata_1 = (uint32*)lua_touserdata(lua_state, 2);
     udata_1 += 1;
     arg::Cpp_Arg *arg_1 = *(arg::Cpp_Arg**)udata_1;
@@ -804,9 +810,9 @@ static int lua___Der2__pt_arg_2(lua_State *lua_state)
 
 static int lua___Der2__b1_id(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Der2 *obj = *(Der2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Der2 *obj = *(Der2**)udata_self;
     int32 v = obj->b1_id;
     lua_pushinteger(lua_state, v);
 
@@ -815,9 +821,9 @@ static int lua___Der2__b1_id(lua_State *lua_state)
 
 static int lua___Der2__set_b1_name(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Der2 *obj = *(Der2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Der2 *obj = *(Der2**)udata_self;
     const char *arg_1 = lua_tostring(lua_state, 2);
     lua_settop(lua_state, 0);
     obj->modify_name(arg_1);
@@ -827,9 +833,9 @@ static int lua___Der2__set_b1_name(lua_State *lua_state)
 
 static int lua___Der2__print_b1(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Der2 *obj = *(Der2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Der2 *obj = *(Der2**)udata_self;
     lua_settop(lua_state, 0);
     obj->pt_b1();
 
@@ -838,9 +844,9 @@ static int lua___Der2__print_b1(lua_State *lua_state)
 
 static int lua___Der2__b2_name(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Der2 *obj = *(Der2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Der2 *obj = *(Der2**)udata_self;
     std::string v = obj->b2_name;
     lua_pushstring(lua_state, v.c_str());
 
@@ -849,9 +855,9 @@ static int lua___Der2__b2_name(lua_State *lua_state)
 
 static int lua___Der2__uniqued_id(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    Der2 *obj = *(Der2**)udata;
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    Der2 *obj = *(Der2**)udata_self;
     lua_settop(lua_state, 0);
     uint32 v = obj->uniqued_id();
     lua_pushunsigned(lua_state, v);
@@ -911,7 +917,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "_arg.Cpp_Arg");
-        luaL_setfunc(lua_state, _arg_Cpp_Arg);
+        luaL_setfuncs(lua_state, _arg_Cpp_Arg, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
@@ -932,7 +938,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "_base.Base1");
-        luaL_setfunc(lua_state, _base_Base1);
+        luaL_setfuncs(lua_state, _base_Base1, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
@@ -952,7 +958,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "_engine._memory.Base2");
-        luaL_setfunc(lua_state, _engine__memory_Base2);
+        luaL_setfuncs(lua_state, _engine__memory_Base2, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
@@ -969,7 +975,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "_engine._memory.Base3.ICls");
-        luaL_setfunc(lua_state, _engine__memory_Base3_ICls);
+        luaL_setfuncs(lua_state, _engine__memory_Base3_ICls, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
@@ -986,7 +992,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "_engine._memory._lll");
-        luaL_setfunc(lua_state, _engine__memory__lll);
+        luaL_setfuncs(lua_state, _engine__memory__lll, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
@@ -1004,7 +1010,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "_engine._memory.Base3");
-        luaL_setfunc(lua_state, _engine__memory_Base3);
+        luaL_setfuncs(lua_state, _engine__memory_Base3, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
@@ -1023,7 +1029,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "_gabriel.b1");
-        luaL_setfunc(lua_state, _gabriel_b1);
+        luaL_setfuncs(lua_state, _gabriel_b1, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
@@ -1042,7 +1048,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "_gabriel.b2");
-        luaL_setfunc(lua_state, _gabriel_b2);
+        luaL_setfuncs(lua_state, _gabriel_b2, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
@@ -1067,7 +1073,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "Derived");
-        luaL_setfunc(lua_state, Derived);
+        luaL_setfuncs(lua_state, Derived, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
@@ -1093,7 +1099,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "Der2");
-        luaL_setfunc(lua_state, Der2);
+        luaL_setfuncs(lua_state, Der2, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     }
