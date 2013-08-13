@@ -952,21 +952,23 @@ static void register_lua(lua_State *lua_state)
     gen_str += %Q{
 
     /* register #{full_name} ------begin------ */
-    luaL_Reg #{reg_func_arr_name}[] = 
-    \{}
+    \{
+        luaL_Reg #{reg_func_arr_name}[] = 
+        \{}
     func_list.each do |export_name, func_name|
       gen_str += %Q{
-        \{"#{export_name}", #{func_name}\},}      
+            \{"#{export_name}", #{func_name}\},}      
     end
     gen_str += %Q{
-        \{NULL, NULL\}
-    \};
+            \{NULL, NULL\}
+        \};
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "#{full_name}");
-    luaL_setfunc(lua_state, #{reg_func_arr_name});
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "#{full_name}");
+        luaL_setfunc(lua_state, #{reg_func_arr_name});
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    \}
     /* register #{full_name} ------end------ */}
   end
   gen_str += "

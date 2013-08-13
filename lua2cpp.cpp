@@ -895,187 +895,207 @@ static void register_lua(lua_State *lua_state)
     build_global_table(lua_state, "Der2");
 
     /* register _arg.Cpp_Arg ------begin------ */
-    luaL_Reg _arg_Cpp_Arg[] = 
     {
-        {"new", lua____arg___Cpp_Arg__new},
-        {"new1", lua____arg___Cpp_Arg__new1},
-        {"hp", lua____arg___Cpp_Arg__hp},
-        {"set_d", lua____arg___Cpp_Arg__set_d},
-        {"set_hp", lua____arg___Cpp_Arg__set_hp},
-        {"get_v", lua____arg___Cpp_Arg__get_v},
-        {"set_v", lua____arg___Cpp_Arg__set_v},
-        {"__gc", lua____arg___Cpp_Arg__garbage_colloect},
-        {NULL, NULL}
-    };
+        luaL_Reg _arg_Cpp_Arg[] = 
+        {
+            {"new", lua____arg___Cpp_Arg__new},
+            {"new1", lua____arg___Cpp_Arg__new1},
+            {"hp", lua____arg___Cpp_Arg__hp},
+            {"set_d", lua____arg___Cpp_Arg__set_d},
+            {"set_hp", lua____arg___Cpp_Arg__set_hp},
+            {"get_v", lua____arg___Cpp_Arg__get_v},
+            {"set_v", lua____arg___Cpp_Arg__set_v},
+            {"__gc", lua____arg___Cpp_Arg__garbage_colloect},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "_arg.Cpp_Arg");
-    luaL_setfunc(lua_state, _arg_Cpp_Arg);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "_arg.Cpp_Arg");
+        luaL_setfunc(lua_state, _arg_Cpp_Arg);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register _arg.Cpp_Arg ------end------ */
 
     /* register _base.Base1 ------begin------ */
-    luaL_Reg _base_Base1[] = 
     {
-        {"new", lua____base___Base1__new},
-        {"owerid", lua____base___Base1__owerid},
-        {"r3r3r", lua____base___Base1__r3r3r},
-        {"IJ3RJ2", lua____base___Base1__IJ3RJ2},
-        {"get_info", lua____base___Base1__get_info},
-        {"__gc", lua____base___Base1__garbage_colloect},
-        {NULL, NULL}
-    };
+        luaL_Reg _base_Base1[] = 
+        {
+            {"new", lua____base___Base1__new},
+            {"owerid", lua____base___Base1__owerid},
+            {"r3r3r", lua____base___Base1__r3r3r},
+            {"IJ3RJ2", lua____base___Base1__IJ3RJ2},
+            {"get_info", lua____base___Base1__get_info},
+            {"__gc", lua____base___Base1__garbage_colloect},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "_base.Base1");
-    luaL_setfunc(lua_state, _base_Base1);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "_base.Base1");
+        luaL_setfunc(lua_state, _base_Base1);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register _base.Base1 ------end------ */
 
     /* register _engine._memory.Base2 ------begin------ */
-    luaL_Reg _engine__memory_Base2[] = 
     {
-        {"new", lua____engine____memory___Base2__new},
-        {"pt_world_v", lua____engine____memory___Base2__pt_world_v},
-        {"pt_world", lua____engine____memory___Base2__pt_world},
-        {"pt_arg_2", lua____engine____memory___Base2__pt_arg_2},
-        {"__gc", lua____engine____memory___Base2__garbage_colloect},
-        {NULL, NULL}
-    };
+        luaL_Reg _engine__memory_Base2[] = 
+        {
+            {"new", lua____engine____memory___Base2__new},
+            {"pt_world_v", lua____engine____memory___Base2__pt_world_v},
+            {"pt_world", lua____engine____memory___Base2__pt_world},
+            {"pt_arg_2", lua____engine____memory___Base2__pt_arg_2},
+            {"__gc", lua____engine____memory___Base2__garbage_colloect},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "_engine._memory.Base2");
-    luaL_setfunc(lua_state, _engine__memory_Base2);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "_engine._memory.Base2");
+        luaL_setfunc(lua_state, _engine__memory_Base2);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register _engine._memory.Base2 ------end------ */
 
     /* register _engine._memory.Base3.ICls ------begin------ */
-    luaL_Reg _engine__memory_Base3_ICls[] = 
     {
-        {"get_name", lua____engine____memory___Base3___ICls__get_name},
-        {"__gc", lua____engine____memory___Base3___ICls__garbage_colloect},
-        {NULL, NULL}
-    };
+        luaL_Reg _engine__memory_Base3_ICls[] = 
+        {
+            {"get_name", lua____engine____memory___Base3___ICls__get_name},
+            {"__gc", lua____engine____memory___Base3___ICls__garbage_colloect},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "_engine._memory.Base3.ICls");
-    luaL_setfunc(lua_state, _engine__memory_Base3_ICls);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "_engine._memory.Base3.ICls");
+        luaL_setfunc(lua_state, _engine__memory_Base3_ICls);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register _engine._memory.Base3.ICls ------end------ */
 
     /* register _engine._memory._lll ------begin------ */
-    luaL_Reg _engine__memory__lll[] = 
     {
-        {"name_str", lua____engine____memory____lll__name_str},
-        {"get_name", lua____engine____memory____lll__get_name},
-        {NULL, NULL}
-    };
+        luaL_Reg _engine__memory__lll[] = 
+        {
+            {"name_str", lua____engine____memory____lll__name_str},
+            {"get_name", lua____engine____memory____lll__get_name},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "_engine._memory._lll");
-    luaL_setfunc(lua_state, _engine__memory__lll);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "_engine._memory._lll");
+        luaL_setfunc(lua_state, _engine__memory__lll);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register _engine._memory._lll ------end------ */
 
     /* register _engine._memory.Base3 ------begin------ */
-    luaL_Reg _engine__memory_Base3[] = 
     {
-        {"get_name", lua____engine____memory___Base3__get_name},
-        {"bb1", lua____engine____memory___Base3__bb1},
-        {"__gc", lua____engine____memory___Base3__garbage_colloect},
-        {NULL, NULL}
-    };
+        luaL_Reg _engine__memory_Base3[] = 
+        {
+            {"get_name", lua____engine____memory___Base3__get_name},
+            {"bb1", lua____engine____memory___Base3__bb1},
+            {"__gc", lua____engine____memory___Base3__garbage_colloect},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "_engine._memory.Base3");
-    luaL_setfunc(lua_state, _engine__memory_Base3);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "_engine._memory.Base3");
+        luaL_setfunc(lua_state, _engine__memory_Base3);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register _engine._memory.Base3 ------end------ */
 
     /* register _gabriel.b1 ------begin------ */
-    luaL_Reg _gabriel_b1[] = 
     {
-        {"b1_id", lua____gabriel___b1__b1_id},
-        {"set_b1_name", lua____gabriel___b1__set_b1_name},
-        {"print_b1", lua____gabriel___b1__print_b1},
-        {"__gc", lua____gabriel___b1__garbage_colloect},
-        {NULL, NULL}
-    };
+        luaL_Reg _gabriel_b1[] = 
+        {
+            {"b1_id", lua____gabriel___b1__b1_id},
+            {"set_b1_name", lua____gabriel___b1__set_b1_name},
+            {"print_b1", lua____gabriel___b1__print_b1},
+            {"__gc", lua____gabriel___b1__garbage_colloect},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "_gabriel.b1");
-    luaL_setfunc(lua_state, _gabriel_b1);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "_gabriel.b1");
+        luaL_setfunc(lua_state, _gabriel_b1);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register _gabriel.b1 ------end------ */
 
     /* register _gabriel.b2 ------begin------ */
-    luaL_Reg _gabriel_b2[] = 
     {
-        {"b2_name", lua____gabriel___b2__b2_name},
-        {"last_name", lua____gabriel___b2__last_name},
-        {"uniqued_id", lua____gabriel___b2__uniqued_id},
-        {"__gc", lua____gabriel___b2__garbage_colloect},
-        {NULL, NULL}
-    };
+        luaL_Reg _gabriel_b2[] = 
+        {
+            {"b2_name", lua____gabriel___b2__b2_name},
+            {"last_name", lua____gabriel___b2__last_name},
+            {"uniqued_id", lua____gabriel___b2__uniqued_id},
+            {"__gc", lua____gabriel___b2__garbage_colloect},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "_gabriel.b2");
-    luaL_setfunc(lua_state, _gabriel_b2);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "_gabriel.b2");
+        luaL_setfunc(lua_state, _gabriel_b2);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register _gabriel.b2 ------end------ */
 
     /* register Derived ------begin------ */
-    luaL_Reg Derived[] = 
     {
-        {"new", lua___Derived__new},
-        {"b_value", lua___Derived__b_value},
-        {"pt_hello_v", lua___Derived__pt_hello_v},
-        {"pt_world", lua___Derived__pt_world},
-        {"pt_arg_2", lua___Derived__pt_arg_2},
-        {"print_static", lua___Derived__print_static},
-        {"b1_id", lua___Derived__b1_id},
-        {"set_b1_name", lua___Derived__set_b1_name},
-        {"print_b1", lua___Derived__print_b1},
-        {"__gc", lua___Derived__garbage_colloect},
-        {NULL, NULL}
-    };
+        luaL_Reg Derived[] = 
+        {
+            {"new", lua___Derived__new},
+            {"b_value", lua___Derived__b_value},
+            {"pt_hello_v", lua___Derived__pt_hello_v},
+            {"pt_world", lua___Derived__pt_world},
+            {"pt_arg_2", lua___Derived__pt_arg_2},
+            {"print_static", lua___Derived__print_static},
+            {"b1_id", lua___Derived__b1_id},
+            {"set_b1_name", lua___Derived__set_b1_name},
+            {"print_b1", lua___Derived__print_b1},
+            {"__gc", lua___Derived__garbage_colloect},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "Derived");
-    luaL_setfunc(lua_state, Derived);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "Derived");
+        luaL_setfunc(lua_state, Derived);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register Derived ------end------ */
 
     /* register Der2 ------begin------ */
-    luaL_Reg Der2[] = 
     {
-        {"new", lua___Der2__new},
-        {"b_value", lua___Der2__b_value},
-        {"pt_hello_v", lua___Der2__pt_hello_v},
-        {"pt_world", lua___Der2__pt_world},
-        {"pt_arg_2", lua___Der2__pt_arg_2},
-        {"b1_id", lua___Der2__b1_id},
-        {"set_b1_name", lua___Der2__set_b1_name},
-        {"print_b1", lua___Der2__print_b1},
-        {"b2_name", lua___Der2__b2_name},
-        {"uniqued_id", lua___Der2__uniqued_id},
-        {"__gc", lua___Der2__garbage_colloect},
-        {NULL, NULL}
-    };
+        luaL_Reg Der2[] = 
+        {
+            {"new", lua___Der2__new},
+            {"b_value", lua___Der2__b_value},
+            {"pt_hello_v", lua___Der2__pt_hello_v},
+            {"pt_world", lua___Der2__pt_world},
+            {"pt_arg_2", lua___Der2__pt_arg_2},
+            {"b1_id", lua___Der2__b1_id},
+            {"set_b1_name", lua___Der2__set_b1_name},
+            {"print_b1", lua___Der2__print_b1},
+            {"b2_name", lua___Der2__b2_name},
+            {"uniqued_id", lua___Der2__uniqued_id},
+            {"__gc", lua___Der2__garbage_colloect},
+            {NULL, NULL}
+        };
 
-    lua_settop(lua_state, 0);
-    get_global_table(lua_state, "Der2");
-    luaL_setfunc(lua_state, Der2);
-    lua_pushvalue(lua_state, -1);
-    lua_setfield(lua_state, -2, "__index");
+        lua_settop(lua_state, 0);
+        get_global_table(lua_state, "Der2");
+        luaL_setfunc(lua_state, Der2);
+        lua_pushvalue(lua_state, -1);
+        lua_setfield(lua_state, -2, "__index");
+    }
     /* register Der2 ------end------ */
 }
