@@ -16,9 +16,8 @@ _arg.Cpp_Arg
     ()
     (int32, _engine._memory.Base2&*, _arg.Cpp_Arg*, number,string)
     static int32 hp
-    int32 id
-    getd : d=_base.Base1
-    set_hp : static _engine._memory.Base3*|gc| hp=int32
+    set_d : d=_base.Base1&
+    set_hp : static hp[0]=int32
     get_v : int32 get_value()
     set_v : set_value(int32)
 }
@@ -77,7 +76,7 @@ Derived extends _gabriel.b1
     bool b_value
     pt_hello_v()
     pt_world()
-    pt_arg_2(_arg.Cpp_Arg*)
+    string pt_arg_2(_arg.Cpp_Arg*, int32, string)
     static print_static(string)
 }
 
