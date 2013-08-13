@@ -380,7 +380,8 @@ def generate_new_function(tbl, func)
     udata += 1;
     *(#{ns_cls_name}**)udata = new #{ns_cls_name}(#{func_str.join(', ')});
     get_global_table(lua_state, "#{tbl["name"]}");
-    lua_setmetatable(lua_state, -2);
+    lua_setmetatable(lua_state, 1);
+    lua_settop(lua_state, 1);
 
     return 1;
 }
@@ -445,7 +446,7 @@ def generate_function(tbl, func)
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
       gen_str += "
     const #{ns_cls_name} *v = #{ns_cls_prefix}#{func["name"]}(#{func_str.join(', ')});
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
@@ -458,7 +459,7 @@ def generate_function(tbl, func)
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
       gen_str += "
     const #{ns_cls_name} *v = &#{ns_cls_prefix}#{func["name"]}(#{func_str.join(', ')});
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
@@ -472,7 +473,7 @@ def generate_function(tbl, func)
       gen_str += "
     #{ns_cls_name} *v = new #{ns_cls_name};
     *v = #{ns_cls_prefix}#{func["name"]}(#{func_str.join(', ')});
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = 1;
     udata += 1;
@@ -483,9 +484,9 @@ def generate_function(tbl, func)
     end
   else #non-static
     gen_str += "
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata;"
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata_self;"
     gen_list = generate_arg_list func, 2
     gen_str += gen_list[0]
     func_str = gen_list[1]
@@ -539,7 +540,7 @@ def generate_function(tbl, func)
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
       gen_str += "
     const #{ns_cls_name} *v = obj->#{func["name"]}(#{func_str.join(', ')});
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
@@ -552,7 +553,7 @@ def generate_function(tbl, func)
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
       gen_str += "
     const #{ns_cls_name} *v = &obj->#{func["name"]}(#{func_str.join(', ')});
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
@@ -566,7 +567,7 @@ def generate_function(tbl, func)
       gen_str += "
     #{ns_cls_name} *v = new #{ns_cls_name};
     *v = obj->#{func["name"]}(#{func_str.join(', ')});
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = 1;
     udata += 1;
@@ -628,7 +629,7 @@ def generate_get_function(tbl, func)
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
       gen_str += "
     const #{ns_cls_name} *v = #{ns_cls_prefix}#{func["name"]};
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
@@ -641,7 +642,7 @@ def generate_get_function(tbl, func)
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
       gen_str += "
     const #{ns_cls_name} *v = &#{ns_cls_prefix}#{func["name"]};
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
@@ -655,7 +656,7 @@ def generate_get_function(tbl, func)
       gen_str += "
     #{ns_cls_name} *v = new #{ns_cls_name};
     *v = #{ns_cls_prefix}#{func["name"]};
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = 1;
     udata += 1;
@@ -666,9 +667,9 @@ def generate_get_function(tbl, func)
     end
   else #non-static
     gen_str += "
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
-    udata += 1;
-    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata;"
+    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    udata_self += 1;
+    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata_self;"
     if func["ret_type"].has_key? "is_basic"
       case func["ret_type"]["name"]
       when "bool"
@@ -713,7 +714,7 @@ def generate_get_function(tbl, func)
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
       gen_str += "
     const #{ns_cls_name} *v = obj->#{func["name"]};
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
@@ -726,7 +727,7 @@ def generate_get_function(tbl, func)
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
       gen_str += "
     const #{ns_cls_name} *v = &obj->#{func["name"]};
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
@@ -740,7 +741,7 @@ def generate_get_function(tbl, func)
       gen_str += "
     #{ns_cls_name} *v = new #{ns_cls_name};
     *v = obj->#{func["name"]};
-    uint32 *udata = lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = 1;
     udata += 1;
@@ -965,7 +966,7 @@ static void register_lua(lua_State *lua_state)
 
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "#{full_name}");
-        luaL_setfunc(lua_state, #{reg_func_arr_name});
+        luaL_setfuncs(lua_state, #{reg_func_arr_name}, 0);
         lua_pushvalue(lua_state, -1);
         lua_setfield(lua_state, -2, "__index");
     \}

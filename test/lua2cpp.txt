@@ -1,0 +1,21 @@
+_dat_ns.Data
+{
+    ()
+    uint32 id
+    set_id : id=uint32
+    string name
+    set_name : name=string
+}
+
+Test_Lua
+{
+    ()
+    _dat_ns.Data get_data()
+    set_data_id(uint32)
+    set_data_name(string)
+    string get_data_name()
+    uint32 get_data_id()
+    replace_data(_dat_ns.Data&)
+}
+    
+    
