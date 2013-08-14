@@ -1,4 +1,4 @@
-print "start lua script................"
+print "---------------------start lua script---------------------"
 
 dat_obj = _dat_ns.Data.new()
 print(dat_obj:id())       ------------> output: 0
@@ -18,6 +18,6 @@ test_lua_obj:replace_data(dat_obj)
 print(test_lua_obj:get_data_id())             --------->output: 92
 print(test_lua_obj:get_data_name())           --------->output: I'm one object
 
-print "finish lua script.................."
+print "--------------------end lua script---------------------------"
 
 

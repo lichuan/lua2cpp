@@ -379,9 +379,7 @@ def generate_new_function(tbl, func)
     gc_flag = 1; /* need gc default in constructor */
     udata += 1;
     *(#{ns_cls_name}**)udata = new #{ns_cls_name}(#{func_str.join(', ')});
-    get_global_table(lua_state, "#{tbl["name"]}");
-    lua_setmetatable(lua_state, 1);
-    lua_settop(lua_state, 1);
+    luaL_setmetatable(lua_state, "#{tbl["name"]}");
 
     return 1;
 }
@@ -444,49 +442,52 @@ def generate_function(tbl, func)
     elsif func["ret_type"].has_key? "is_ptr"
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     const #{ns_cls_name} *v = #{ns_cls_prefix}#{func["name"]}(#{func_str.join(', ')});
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
     *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     elsif func["ret_type"].has_key? "is_ref"
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     const #{ns_cls_name} *v = &#{ns_cls_prefix}#{func["name"]}(#{func_str.join(', ')});
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
     *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     else
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     #{ns_cls_name} *v = new #{ns_cls_name};
     *v = #{ns_cls_prefix}#{func["name"]}(#{func_str.join(', ')});
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
-    gc_flag = 1;
+    gc_flag = 1; /* no ptr, no ref, it's a new obj, so it need gc */
     udata += 1;
     *(#{ns_cls_name}**)udata = v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     end
   else #non-static
-    gen_str += "
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    gen_str += %Q{
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "#{tbl["name"]}");
     udata_self += 1;
-    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata_self;"
+    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata_self;}
     gen_list = generate_arg_list func, 2
     gen_str += gen_list[0]
     func_str = gen_list[1]
@@ -538,43 +539,46 @@ def generate_function(tbl, func)
     elsif func["ret_type"].has_key? "is_ptr"
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     const #{ns_cls_name} *v = obj->#{func["name"]}(#{func_str.join(', ')});
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
     *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     elsif func["ret_type"].has_key? "is_ref"
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     const #{ns_cls_name} *v = &obj->#{func["name"]}(#{func_str.join(', ')});
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
     *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     else
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     #{ns_cls_name} *v = new #{ns_cls_name};
     *v = obj->#{func["name"]}(#{func_str.join(', ')});
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
-    gc_flag = 1;
+    gc_flag = 1; /* no ptr, no ref, it's a new obj, so it need gc */
     udata += 1;
     *(#{ns_cls_name}**)udata = v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     end
   end
   gen_str
@@ -627,49 +631,52 @@ def generate_get_function(tbl, func)
     elsif func["ret_type"].has_key? "is_ptr"
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     const #{ns_cls_name} *v = #{ns_cls_prefix}#{func["name"]};
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
     *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     elsif func["ret_type"].has_key? "is_ref"
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     const #{ns_cls_name} *v = &#{ns_cls_prefix}#{func["name"]};
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
     *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     else
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     #{ns_cls_name} *v = new #{ns_cls_name};
     *v = #{ns_cls_prefix}#{func["name"]};
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
-    gc_flag = 1;
+    gc_flag = 1; /* no ptr, no ref, it's a new obj, so it need gc */
     udata += 1;
     *(#{ns_cls_name}**)udata = v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     end
   else #non-static
-    gen_str += "
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    gen_str += %Q{
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "#{tbl["name"]}");
     udata_self += 1;
-    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata_self;"
+    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata_self;}
     if func["ret_type"].has_key? "is_basic"
       case func["ret_type"]["name"]
       when "bool"
@@ -712,43 +719,46 @@ def generate_get_function(tbl, func)
     elsif func["ret_type"].has_key? "is_ptr"
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     const #{ns_cls_name} *v = obj->#{func["name"]};
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
     *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     elsif func["ret_type"].has_key? "is_ref"
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     const #{ns_cls_name} *v = &obj->#{func["name"]};
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
     gc_flag = #{func["ret_type"].has_key?("is_gc") ? 1 : 0};
     udata += 1;
     *(#{ns_cls_name}**)udata = (#{ns_cls_name}*)v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     else
       ret_type_info = $reg_info[func["ret_type"]["name"]]
       ns_cls_name = generate_ns_class_name(ret_type_info["namespace"], ret_type_info["class"])
-      gen_str += "
+      gen_str += %Q{
     #{ns_cls_name} *v = new #{ns_cls_name};
     *v = obj->#{func["name"]};
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(#{ns_cls_name}*));
     uint32 &gc_flag = *udata;
-    gc_flag = 1;
+    gc_flag = 1; /* no ptr, no ref, it's a new obj, so it need gc */
     udata += 1;
     *(#{ns_cls_name}**)udata = v;
+    luaL_setmetatable(lua_state, "#{ret_type_info["name"]}");
 
     return 1;
-"
+}
     end
   end
   gen_str
@@ -763,41 +773,41 @@ def generate_arg_list(func, start_idx)
       case arg["name"]
       when "bool"
         gen_str += "
-    bool arg_#{idx} = lua_toboolean(lua_state, #{stack_idx}) > 0 ? true : false;"
+    bool arg_#{idx} = luaL_checkint(lua_state, #{stack_idx}) > 0 ? true : false;"
         func_str << "arg_#{idx}"
       when "int32"
         gen_str += "
-    int32 arg_#{idx} = lua_tointeger(lua_state, #{stack_idx});"
+    int32 arg_#{idx} = luaL_checkint(lua_state, #{stack_idx});"
         func_str << "arg_#{idx}"
       when "number"
         gen_str += "
-    double arg_#{idx} = lua_tonumber(lua_state, #{stack_idx});"
+    double arg_#{idx} = luaL_checknumber(lua_state, #{stack_idx});"
         func_str << "arg_#{idx}"
       when "uint32"
         gen_str += "
-    uint32 arg_#{idx} = lua_tounsigned(lua_state, #{stack_idx});"
+    uint32 arg_#{idx} = luaL_checkunsigned(lua_state, #{stack_idx});"
         func_str << "arg_#{idx}"
       when "string"
         gen_str += "
-    const char *arg_#{idx} = lua_tostring(lua_state, #{stack_idx});"
+    const char *arg_#{idx} = luaL_checkstring(lua_state, #{stack_idx});"
         func_str << "arg_#{idx}"
       else        
       end
     elsif arg.has_key? "is_ptr"
       arg_cls_info = $reg_info[arg["name"]]
       arg_cls = generate_ns_class_name(arg_cls_info["namespace"], arg_cls_info["class"])
-      gen_str += "
-    uint32 *udata_#{idx} = (uint32*)lua_touserdata(lua_state, #{stack_idx});
+      gen_str += %Q{
+    uint32 *udata_#{idx} = (uint32*)luaL_checkudata(lua_state, #{stack_idx}, "#{arg_cls_info["name"]}");
     udata_#{idx} += 1;
-    #{arg_cls} *arg_#{idx} = *(#{arg_cls}**)udata_#{idx};"
+    #{arg_cls} *arg_#{idx} = *(#{arg_cls}**)udata_#{idx};}
       func_str << "arg_#{idx}"
     else #is_ref
       arg_cls_info = $reg_info[arg["name"]]
       arg_cls = generate_ns_class_name(arg_cls_info["namespace"], arg_cls_info["class"])
-      gen_str += "
-    uint32 *udata_#{idx} = (uint32*)lua_touserdata(lua_state, #{stack_idx});
+      gen_str += %Q{
+    uint32 *udata_#{idx} = (uint32*)luaL_checkudata(lua_state, #{stack_idx}, "#{arg_cls_info["name"]}");
     udata_#{idx} += 1;
-    #{arg_cls} *arg_#{idx} = *(#{arg_cls}**)udata_#{idx};"
+    #{arg_cls} *arg_#{idx} = *(#{arg_cls}**)udata_#{idx};}
       func_str << "*arg_#{idx}"
     end
     idx += 1
@@ -822,10 +832,10 @@ def generate_set_function(tbl, func)
     return 0;
 "
   else
-    gen_str += "
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
+    gen_str += %Q{
+    uint32 *udata = (uint32*)luaL_checkudata(lua_state, 1, "#{tbl["name"]}");
     udata += 1;
-    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata;"
+    #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata;}
     gen_list = generate_arg_list func, 2
     gen_str += gen_list[0]
     func_str = gen_list[1]
@@ -911,20 +921,20 @@ static int "
       gen_str += "
 {"
       ns_cls_name = generate_ns_class_name(tbl["namespace"], tbl["class"])
-      gen_str += "
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
+      gen_str += %Q{
+    uint32 *udata = (uint32*)luaL_checkudata(lua_state, 1, "#{tbl["name"]}");
     uint32 &gc_flag = *udata;
  
     if(gc_flag == 1)
-    {
+    \{
         udata += 1;
         #{ns_cls_name} *obj = *(#{ns_cls_name}**)udata;
         delete obj;
-    }
+    \}
 
     return 0;
+\}
 }
-"
     end
   end
   gen_str += "
@@ -939,20 +949,25 @@ static void register_lua(lua_State *lua_state)
     lua_pushcfunction(lua_state, #{func_name});
     lua_setglobal(lua_state, "#{export_name}");}
     end
+    gen_str += "
+"
   end
   gen_str += "
-
-    /* register other namespace */"
+    /* register non-global namespace */"
   $reg_info.each_key do |full_name|
     gen_str += %Q{
-    build_global_table(lua_state, "#{full_name}");} if full_name != "_" #except global namespace
+    lua_settop(lua_state, 0);
+    build_global_table(lua_state, "#{full_name}");
+    get_global_table(lua_state, "#{full_name}");
+    luaL_newmetatable(lua_state, "#{full_name}");
+    lua_pushvalue(lua_state, -2);
+    lua_setfield(lua_state, -2, "__index");
+} if full_name != "_" #except global namespace
   end  
   $reg_func_tbl.each do |full_name, func_list|
     next if full_name == "_"
     reg_func_arr_name = full_name.gsub(/\./, "_")
     gen_str += %Q{
-
-    /* register #{full_name} ------begin------ */
     \{
         luaL_Reg #{reg_func_arr_name}[] = 
         \{}
@@ -967,13 +982,11 @@ static void register_lua(lua_State *lua_state)
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "#{full_name}");
         luaL_setfuncs(lua_state, #{reg_func_arr_name}, 0);
-        lua_pushvalue(lua_state, -1);
-        lua_setfield(lua_state, -2, "__index");
     \}
-    /* register #{full_name} ------end------ */}
+}
   end
-  gen_str += "
-}"
+  gen_str += "}
+"
   File.open("./lua2cpp.cpp", "w").write(gen_str)
 end
 

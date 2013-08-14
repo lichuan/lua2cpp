@@ -154,16 +154,14 @@ static int lua____dat_ns___Data__new(lua_State *lua_state)
     gc_flag = 1; /* need gc default in constructor */
     udata += 1;
     *(dat_ns::Data**)udata = new dat_ns::Data();
-    get_global_table(lua_state, "_dat_ns.Data");
-    lua_setmetatable(lua_state, 1);
-    lua_settop(lua_state, 1);
+    luaL_setmetatable(lua_state, "_dat_ns.Data");
 
     return 1;
 }
 
 static int lua____dat_ns___Data__id(lua_State *lua_state)
 {
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "_dat_ns.Data");
     udata_self += 1;
     dat_ns::Data *obj = *(dat_ns::Data**)udata_self;
     uint32 v = obj->id;
@@ -174,10 +172,10 @@ static int lua____dat_ns___Data__id(lua_State *lua_state)
 
 static int lua____dat_ns___Data__set_id(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata = (uint32*)luaL_checkudata(lua_state, 1, "_dat_ns.Data");
     udata += 1;
     dat_ns::Data *obj = *(dat_ns::Data**)udata;
-    uint32 arg_1 = lua_tounsigned(lua_state, 2);
+    uint32 arg_1 = luaL_checkunsigned(lua_state, 2);
     lua_settop(lua_state, 0);
     obj->id = arg_1;
 
@@ -186,7 +184,7 @@ static int lua____dat_ns___Data__set_id(lua_State *lua_state)
 
 static int lua____dat_ns___Data__name(lua_State *lua_state)
 {
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "_dat_ns.Data");
     udata_self += 1;
     dat_ns::Data *obj = *(dat_ns::Data**)udata_self;
     std::string v = obj->name;
@@ -197,10 +195,10 @@ static int lua____dat_ns___Data__name(lua_State *lua_state)
 
 static int lua____dat_ns___Data__set_name(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata = (uint32*)luaL_checkudata(lua_state, 1, "_dat_ns.Data");
     udata += 1;
     dat_ns::Data *obj = *(dat_ns::Data**)udata;
-    const char *arg_1 = lua_tostring(lua_state, 2);
+    const char *arg_1 = luaL_checkstring(lua_state, 2);
     lua_settop(lua_state, 0);
     obj->name = arg_1;
 
@@ -209,7 +207,7 @@ static int lua____dat_ns___Data__set_name(lua_State *lua_state)
 
 static int lua____dat_ns___Data__garbage_colloect(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata = (uint32*)luaL_checkudata(lua_state, 1, "_dat_ns.Data");
     uint32 &gc_flag = *udata;
  
     if(gc_flag == 1)
@@ -230,16 +228,14 @@ static int lua___Test_Lua__new(lua_State *lua_state)
     gc_flag = 1; /* need gc default in constructor */
     udata += 1;
     *(Test_Lua**)udata = new Test_Lua();
-    get_global_table(lua_state, "Test_Lua");
-    lua_setmetatable(lua_state, 1);
-    lua_settop(lua_state, 1);
+    luaL_setmetatable(lua_state, "Test_Lua");
 
     return 1;
 }
 
 static int lua___Test_Lua__get_data(lua_State *lua_state)
 {
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "Test_Lua");
     udata_self += 1;
     Test_Lua *obj = *(Test_Lua**)udata_self;
     lua_settop(lua_state, 0);
@@ -247,19 +243,20 @@ static int lua___Test_Lua__get_data(lua_State *lua_state)
     *v = obj->get_data();
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(dat_ns::Data*));
     uint32 &gc_flag = *udata;
-    gc_flag = 1;
+    gc_flag = 1; /* no ptr, no ref, it's a new obj, so it need gc */
     udata += 1;
     *(dat_ns::Data**)udata = v;
+    luaL_setmetatable(lua_state, "_dat_ns.Data");
 
     return 1;
 }
 
 static int lua___Test_Lua__set_data_id(lua_State *lua_state)
 {
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "Test_Lua");
     udata_self += 1;
     Test_Lua *obj = *(Test_Lua**)udata_self;
-    uint32 arg_1 = lua_tounsigned(lua_state, 2);
+    uint32 arg_1 = luaL_checkunsigned(lua_state, 2);
     lua_settop(lua_state, 0);
     obj->set_data_id(arg_1);
 
@@ -268,10 +265,10 @@ static int lua___Test_Lua__set_data_id(lua_State *lua_state)
 
 static int lua___Test_Lua__set_data_name(lua_State *lua_state)
 {
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "Test_Lua");
     udata_self += 1;
     Test_Lua *obj = *(Test_Lua**)udata_self;
-    const char *arg_1 = lua_tostring(lua_state, 2);
+    const char *arg_1 = luaL_checkstring(lua_state, 2);
     lua_settop(lua_state, 0);
     obj->set_data_name(arg_1);
 
@@ -280,7 +277,7 @@ static int lua___Test_Lua__set_data_name(lua_State *lua_state)
 
 static int lua___Test_Lua__get_data_name(lua_State *lua_state)
 {
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "Test_Lua");
     udata_self += 1;
     Test_Lua *obj = *(Test_Lua**)udata_self;
     lua_settop(lua_state, 0);
@@ -292,7 +289,7 @@ static int lua___Test_Lua__get_data_name(lua_State *lua_state)
 
 static int lua___Test_Lua__get_data_id(lua_State *lua_state)
 {
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "Test_Lua");
     udata_self += 1;
     Test_Lua *obj = *(Test_Lua**)udata_self;
     lua_settop(lua_state, 0);
@@ -304,10 +301,10 @@ static int lua___Test_Lua__get_data_id(lua_State *lua_state)
 
 static int lua___Test_Lua__replace_data(lua_State *lua_state)
 {
-    uint32 *udata_self = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "Test_Lua");
     udata_self += 1;
     Test_Lua *obj = *(Test_Lua**)udata_self;
-    uint32 *udata_1 = (uint32*)lua_touserdata(lua_state, 2);
+    uint32 *udata_1 = (uint32*)luaL_checkudata(lua_state, 2, "_dat_ns.Data");
     udata_1 += 1;
     dat_ns::Data *arg_1 = *(dat_ns::Data**)udata_1;
     lua_settop(lua_state, 0);
@@ -318,7 +315,7 @@ static int lua___Test_Lua__replace_data(lua_State *lua_state)
 
 static int lua___Test_Lua__garbage_colloect(lua_State *lua_state)
 {
-    uint32 *udata = (uint32*)lua_touserdata(lua_state, 1);
+    uint32 *udata = (uint32*)luaL_checkudata(lua_state, 1, "Test_Lua");
     uint32 &gc_flag = *udata;
  
     if(gc_flag == 1)
@@ -333,12 +330,21 @@ static int lua___Test_Lua__garbage_colloect(lua_State *lua_state)
 
 static void register_lua(lua_State *lua_state)
 {
-
-    /* register other namespace */
+    /* register non-global namespace */
+    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_dat_ns.Data");
-    build_global_table(lua_state, "Test_Lua");
+    get_global_table(lua_state, "_dat_ns.Data");
+    luaL_newmetatable(lua_state, "_dat_ns.Data");
+    lua_pushvalue(lua_state, -2);
+    lua_setfield(lua_state, -2, "__index");
 
-    /* register _dat_ns.Data ------begin------ */
+    lua_settop(lua_state, 0);
+    build_global_table(lua_state, "Test_Lua");
+    get_global_table(lua_state, "Test_Lua");
+    luaL_newmetatable(lua_state, "Test_Lua");
+    lua_pushvalue(lua_state, -2);
+    lua_setfield(lua_state, -2, "__index");
+
     {
         luaL_Reg _dat_ns_Data[] = 
         {
@@ -354,12 +360,8 @@ static void register_lua(lua_State *lua_state)
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "_dat_ns.Data");
         luaL_setfuncs(lua_state, _dat_ns_Data, 0);
-        lua_pushvalue(lua_state, -1);
-        lua_setfield(lua_state, -2, "__index");
     }
-    /* register _dat_ns.Data ------end------ */
 
-    /* register Test_Lua ------begin------ */
     {
         luaL_Reg Test_Lua[] = 
         {
@@ -377,8 +379,5 @@ static void register_lua(lua_State *lua_state)
         lua_settop(lua_state, 0);
         get_global_table(lua_state, "Test_Lua");
         luaL_setfuncs(lua_state, Test_Lua, 0);
-        lua_pushvalue(lua_state, -1);
-        lua_setfield(lua_state, -2, "__index");
     }
-    /* register Test_Lua ------end------ */
 }
