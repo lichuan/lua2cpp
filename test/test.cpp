@@ -37,6 +37,11 @@ public:
         return m_data;
     }
 
+    dat_ns::Data& get_ref_data()
+    {
+        return m_data;
+    }    
+
     void set_data_id(uint32 id)
     {
         m_data.id = id;

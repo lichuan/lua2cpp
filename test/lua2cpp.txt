@@ -11,6 +11,7 @@ Test_Lua
 {
     ()
     _dat_ns.Data get_data()
+    _dat_ns.Data& get_ref_data()
     set_data_id(uint32)
     set_data_name(string)
     string get_data_name()

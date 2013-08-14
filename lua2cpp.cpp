@@ -163,6 +163,22 @@ static int lua__ooopp(lua_State *lua_state)
     return 1;
 }
 
+static int lua__get_obj(lua_State *lua_state)
+{
+    int32 arg_1 = luaL_checkint(lua_state, 1);
+    const char *arg_2 = luaL_checkstring(lua_state, 2);
+    lua_settop(lua_state, 0);
+    const arg::Cpp_Arg *v = &get_ns_obj(arg_1, arg_2);
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(arg::Cpp_Arg*));
+    uint32 &gc_flag = *udata;
+    gc_flag = 0;
+    udata += 1;
+    *(arg::Cpp_Arg**)udata = (arg::Cpp_Arg*)v;
+    luaL_setmetatable(lua_state, "_arg.Cpp_Arg");
+
+    return 1;
+}
+
 static int lua____arg___Cpp_Arg__new(lua_State *lua_state)
 {
     lua_settop(lua_state, 0);
@@ -224,7 +240,7 @@ static int lua____arg___Cpp_Arg__set_hp(lua_State *lua_state)
 {
     int32 arg_1 = luaL_checkint(lua_state, 1);
     lua_settop(lua_state, 0);
-    arg::Cpp_Arg::hp[0] = arg_1;
+    arg::Cpp_Arg::hp = arg_1;
 
     return 0;
 }
@@ -448,9 +464,10 @@ static int lua____engine____memory___Base3___ICls__garbage_colloect(lua_State *l
     return 0;
 }
 
-static int lua____engine____memory____lll__name_str(lua_State *lua_state)
+static int lua____engine____memory____lll__get_base(lua_State *lua_state)
 {
-    const base::Base1 *v = &engine::memory::lll::name_str;
+    lua_settop(lua_state, 0);
+    const base::Base1 *v = engine::memory::lll::get_base();
     uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(base::Base1*));
     uint32 &gc_flag = *udata;
     gc_flag = 1;
@@ -878,6 +895,8 @@ static void register_lua(lua_State *lua_state)
     lua_setglobal(lua_state, "exe_script");
     lua_pushcfunction(lua_state, lua__ooopp);
     lua_setglobal(lua_state, "ooopp");
+    lua_pushcfunction(lua_state, lua__get_obj);
+    lua_setglobal(lua_state, "get_obj");
 
     /* register non-global namespace */
     lua_settop(lua_state, 0);
@@ -1018,7 +1037,7 @@ static void register_lua(lua_State *lua_state)
     {
         luaL_Reg _engine__memory__lll[] = 
         {
-            {"name_str", lua____engine____memory____lll__name_str},
+            {"get_base", lua____engine____memory____lll__get_base},
             {"get_name", lua____engine____memory____lll__get_name},
             {NULL, NULL}
         };

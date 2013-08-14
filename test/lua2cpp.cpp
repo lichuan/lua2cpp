@@ -251,6 +251,23 @@ static int lua___Test_Lua__get_data(lua_State *lua_state)
     return 1;
 }
 
+static int lua___Test_Lua__get_ref_data(lua_State *lua_state)
+{
+    uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "Test_Lua");
+    udata_self += 1;
+    Test_Lua *obj = *(Test_Lua**)udata_self;
+    lua_settop(lua_state, 0);
+    const dat_ns::Data *v = &obj->get_ref_data();
+    uint32 *udata = (uint32*)lua_newuserdata(lua_state, sizeof(uint32) + sizeof(dat_ns::Data*));
+    uint32 &gc_flag = *udata;
+    gc_flag = 0;
+    udata += 1;
+    *(dat_ns::Data**)udata = (dat_ns::Data*)v;
+    luaL_setmetatable(lua_state, "_dat_ns.Data");
+
+    return 1;
+}
+
 static int lua___Test_Lua__set_data_id(lua_State *lua_state)
 {
     uint32 *udata_self = (uint32*)luaL_checkudata(lua_state, 1, "Test_Lua");
@@ -367,6 +384,7 @@ static void register_lua(lua_State *lua_state)
         {
             {"new", lua___Test_Lua__new},
             {"get_data", lua___Test_Lua__get_data},
+            {"get_ref_data", lua___Test_Lua__get_ref_data},
             {"set_data_id", lua___Test_Lua__set_data_id},
             {"set_data_name", lua___Test_Lua__set_data_name},
             {"get_data_name", lua___Test_Lua__get_data_name},

@@ -2,15 +2,16 @@ _
 {
     exe_script(string)
     string ooopp
+    get_obj : _arg.Cpp_Arg& get_ns_obj(int32, string)
 }
 
 _arg.Cpp_Arg
 {
     ()
-    (int32, _engine._memory.Base2&*, _arg.Cpp_Arg*, number,string)
+    (int32, _engine._memory.Base2&, _arg.Cpp_Arg*, number,string)
     static int32 hp
     set_d : d=_base.Base1&
-    set_hp : static hp[0]=int32
+    set_hp : static hp=int32
     get_v : int32 get_value()
     set_v : set_value(int32)
 }
@@ -39,7 +40,7 @@ _engine._memory.Base3.ICls
 
 _engine._memory._lll
 {
- _base.Base1&|gc| name_str
+ _base.Base1*|gc| get_base()
     string   get_name(int32)
 }
 
@@ -75,5 +76,5 @@ Derived extends _gabriel.b1
 
 Der2 extends Derived, _gabriel.b2
 {
-(bool, int32, string)
+    (bool, int32, string)
 }
