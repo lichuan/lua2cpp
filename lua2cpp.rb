@@ -956,14 +956,10 @@ static void register_lua(lua_State *lua_state)
     /* register non-global namespace */"
   $reg_info.each_key do |full_name|
     gen_str += %Q{
-    lua_settop(lua_state, 0);
-    build_global_table(lua_state, "#{full_name}");
-    get_global_table(lua_state, "#{full_name}");
-    luaL_newmetatable(lua_state, "#{full_name}");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-} if full_name != "_" #except global namespace
-  end  
+    build_global_table(lua_state, "#{full_name}");} if full_name != "_" #except global namespace
+  end
+  gen_str += "
+"
   $reg_func_tbl.each do |full_name, func_list|
     next if full_name == "_"
     reg_func_arr_name = full_name.gsub(/\./, "_")
@@ -980,6 +976,9 @@ static void register_lua(lua_State *lua_state)
         \};
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "#{full_name}");
+        luaL_setfuncs(lua_state, #{reg_func_arr_name}, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "#{full_name}");
         luaL_setfuncs(lua_state, #{reg_func_arr_name}, 0);
     \}

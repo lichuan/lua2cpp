@@ -899,75 +899,16 @@ static void register_lua(lua_State *lua_state)
     lua_setglobal(lua_state, "get_obj");
 
     /* register non-global namespace */
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_arg.Cpp_Arg");
-    get_global_table(lua_state, "_arg.Cpp_Arg");
-    luaL_newmetatable(lua_state, "_arg.Cpp_Arg");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_base.Base1");
-    get_global_table(lua_state, "_base.Base1");
-    luaL_newmetatable(lua_state, "_base.Base1");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_engine._memory.Base2");
-    get_global_table(lua_state, "_engine._memory.Base2");
-    luaL_newmetatable(lua_state, "_engine._memory.Base2");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_engine._memory.Base3.ICls");
-    get_global_table(lua_state, "_engine._memory.Base3.ICls");
-    luaL_newmetatable(lua_state, "_engine._memory.Base3.ICls");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_engine._memory._lll");
-    get_global_table(lua_state, "_engine._memory._lll");
-    luaL_newmetatable(lua_state, "_engine._memory._lll");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_engine._memory.Base3");
-    get_global_table(lua_state, "_engine._memory.Base3");
-    luaL_newmetatable(lua_state, "_engine._memory.Base3");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_gabriel.b1");
-    get_global_table(lua_state, "_gabriel.b1");
-    luaL_newmetatable(lua_state, "_gabriel.b1");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_gabriel.b2");
-    get_global_table(lua_state, "_gabriel.b2");
-    luaL_newmetatable(lua_state, "_gabriel.b2");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "Derived");
-    get_global_table(lua_state, "Derived");
-    luaL_newmetatable(lua_state, "Derived");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "Der2");
-    get_global_table(lua_state, "Der2");
-    luaL_newmetatable(lua_state, "Der2");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
 
     {
         luaL_Reg _arg_Cpp_Arg[] = 
@@ -984,6 +925,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "_arg.Cpp_Arg");
+        luaL_setfuncs(lua_state, _arg_Cpp_Arg, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "_arg.Cpp_Arg");
         luaL_setfuncs(lua_state, _arg_Cpp_Arg, 0);
     }
@@ -1001,6 +945,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "_base.Base1");
+        luaL_setfuncs(lua_state, _base_Base1, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "_base.Base1");
         luaL_setfuncs(lua_state, _base_Base1, 0);
     }
@@ -1017,6 +964,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "_engine._memory.Base2");
+        luaL_setfuncs(lua_state, _engine__memory_Base2, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "_engine._memory.Base2");
         luaL_setfuncs(lua_state, _engine__memory_Base2, 0);
     }
@@ -1030,6 +980,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "_engine._memory.Base3.ICls");
+        luaL_setfuncs(lua_state, _engine__memory_Base3_ICls, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "_engine._memory.Base3.ICls");
         luaL_setfuncs(lua_state, _engine__memory_Base3_ICls, 0);
     }
@@ -1043,6 +996,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "_engine._memory._lll");
+        luaL_setfuncs(lua_state, _engine__memory__lll, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "_engine._memory._lll");
         luaL_setfuncs(lua_state, _engine__memory__lll, 0);
     }
@@ -1057,6 +1013,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "_engine._memory.Base3");
+        luaL_setfuncs(lua_state, _engine__memory_Base3, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "_engine._memory.Base3");
         luaL_setfuncs(lua_state, _engine__memory_Base3, 0);
     }
@@ -1072,6 +1031,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "_gabriel.b1");
+        luaL_setfuncs(lua_state, _gabriel_b1, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "_gabriel.b1");
         luaL_setfuncs(lua_state, _gabriel_b1, 0);
     }
@@ -1087,6 +1049,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "_gabriel.b2");
+        luaL_setfuncs(lua_state, _gabriel_b2, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "_gabriel.b2");
         luaL_setfuncs(lua_state, _gabriel_b2, 0);
     }
@@ -1108,6 +1073,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "Derived");
+        luaL_setfuncs(lua_state, Derived, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "Derived");
         luaL_setfuncs(lua_state, Derived, 0);
     }
@@ -1130,6 +1098,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "Der2");
+        luaL_setfuncs(lua_state, Der2, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "Der2");
         luaL_setfuncs(lua_state, Der2, 0);
     }

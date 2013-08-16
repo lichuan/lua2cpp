@@ -348,19 +348,8 @@ static int lua___Test_Lua__garbage_colloect(lua_State *lua_state)
 static void register_lua(lua_State *lua_state)
 {
     /* register non-global namespace */
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "_dat_ns.Data");
-    get_global_table(lua_state, "_dat_ns.Data");
-    luaL_newmetatable(lua_state, "_dat_ns.Data");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
-
-    lua_settop(lua_state, 0);
     build_global_table(lua_state, "Test_Lua");
-    get_global_table(lua_state, "Test_Lua");
-    luaL_newmetatable(lua_state, "Test_Lua");
-    lua_pushvalue(lua_state, -2);
-    lua_setfield(lua_state, -2, "__index");
 
     {
         luaL_Reg _dat_ns_Data[] = 
@@ -375,6 +364,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "_dat_ns.Data");
+        luaL_setfuncs(lua_state, _dat_ns_Data, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "_dat_ns.Data");
         luaL_setfuncs(lua_state, _dat_ns_Data, 0);
     }
@@ -395,6 +387,9 @@ static void register_lua(lua_State *lua_state)
         };
 
         lua_settop(lua_state, 0);
+        luaL_newmetatable(lua_state, "Test_Lua");
+        luaL_setfuncs(lua_state, Test_Lua, 0);
+        lua_setfield(lua_state, -1, "__index");
         get_global_table(lua_state, "Test_Lua");
         luaL_setfuncs(lua_state, Test_Lua, 0);
     }
