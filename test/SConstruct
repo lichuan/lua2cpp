@@ -1,1 +1,1 @@
-Program("test.cpp", LIBS=['lua'], LIBPATH=["."], CPPPATH=['/home/lichuan/repos/gabriel/src/3rd-party/lua-5.2.2/src'], CCFLAGS='-g', LINKFLAGS='-ldl')
+Program("test.cpp", LIBS=['lua5.2'], LIBPATH=["/usr/lib/x86_64-linux-gnu/"], CPPPATH=["/usr/include/lua5.2"], CCFLAGS='-g', LINKFLAGS='-ldl')
