@@ -888,7 +888,7 @@ static int lua___Der2__garbage_colloect(lua_State *lua_state)
     return 0;
 }
 
-static void register_lua(lua_State *lua_state)
+static void register_lua2cpp(lua_State *lua_state)
 {
     /* register global namespace */
     lua_pushcfunction(lua_state, lua__exe_script);
